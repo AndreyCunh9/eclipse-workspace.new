@@ -1,0 +1,9 @@
+/* Coloque aqui seu codigo CSS */
+/* mesmo CSS da seção A */
+.cards-container{display:flex;flex-wrap:wrap;gap:24px;justify-content:flex-start;margin:24px 12px;}
+.card-widget{flex:1 1 260px;max-width:300px;background:#fff;border-radius:14px;padding:22px;text-align:center;cursor:pointer;transition:all .25s ease;box-shadow:0 6px 18px rgba(0,0,0,.07);border:1px solid rgba(0,0,0,.06);}
+.card-widget:hover{transform:translateY(-6px);box-shadow:0 10px 24px rgba(0,0,0,.12);}
+.card-widget img,.card-widget i{max-width:90px;margin-bottom:16px;display:inline-block;}
+.card-widget h3{font-size:18px;margin:8px 0 6px;color:#2b2b2b;}
+.card-widget p{font-size:14px;color:#666;line-height:1.35;}
+@media (max-width:768px){.card-widget{flex:1 1 100%;max-width:100%;}}

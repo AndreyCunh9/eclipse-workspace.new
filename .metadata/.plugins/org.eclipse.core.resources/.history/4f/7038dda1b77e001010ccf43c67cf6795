@@ -1,0 +1,5 @@
+<div id="SlotInstantSearch" slot="true" class="slotint slot-header-actions">
+    <#list (pageRender.getInstancesIds("SlotInstantSearch"))! as id>
+        ${pageRender.renderInstanceNoDecorator(id)}
+    </#list>
+</div>

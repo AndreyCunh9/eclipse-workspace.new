@@ -1,0 +1,24 @@
+var ComprasDigital = SuperWidget.extend({
+  init: function () {
+    var grid = $('#cd-grid-' + this.instanceId);
+    var tpl = $('#cd-card-tpl-' + this.instanceId).html();
+
+    var cards = [];
+    try { cards = JSON.parse(this.cards || '[]'); } catch (e) { cards = []; }
+
+    if (!Array.isArray(cards)) cards = [];
+
+    // render simples ({{chaves}}) sem libs externas
+    function render(tpl, data) {
+      return tpl.replace(/{{(\w+)}}/g, function (_, k) { return data[k] || ''; });
+    }
+
+    cards.forEach(function (c) {
+      c.target = c.target || '_self';
+      c.icon   = c.icon   || 'fluigicon-document';
+      grid.append(render(tpl, c));
+    });
+  },
+
+  bindings: { local: {} }
+});

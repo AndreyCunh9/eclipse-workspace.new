@@ -1,0 +1,41 @@
+function createDataset(fields, constraints, sortFields) {
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/uf_mata010"; // relativo à URL base configurada no serviço
+    var method = "POST";
+    var params = "{}"; // corpo da requisição JSON
+
+    if (constraints) {
+        constraints.forEach(function(c) {
+            if (c.fieldName == "serviceCode") serviceCode = c.initialValue;
+            if (c.fieldName == "endpoint") endpoint = c.initialValue;
+            if (c.fieldName == "method") method = c.initialValue.toUpperCase();
+            if (c.fieldName == "params") params = c.initialValue;
+        });
+    }
+
+    var dataset = DatasetBuilder.newDataset();
+
+    try {
+        var serviceHelper = ServiceManager.getService(serviceCode);
+        var serviceLocator = serviceHelper.getBean();
+        var httpService = serviceLocator.getHttpService();
+
+        var response = httpService.invoke(
+            params,
+            endpoint,
+            method,
+            "application/json",
+            null,
+            5000
+        );
+
+        log.info("Retorno Protheus: " + response); // 👈 debug no server.log
+
+        dataset.addRow(["200", response, ""]);
+
+    } catch (e) {
+        log.error("Erro ao chamar Protheus: " + e);
+        dataset.addRow(["Erro", "", (e.message || e.toString())]);
+    }
+
+}

@@ -1,0 +1,48 @@
+<div id="MyWidget_${instanceId}" class="super-widget wcm-widget-class fluig-style-guide" data-params="MyWidget.instance()">
+<div class="form-group">
+  <label>Usar ícones do Fluig? (S/N)</label>
+  <input type="text" name="usaIcones" value="${(params.usaIcones!'N')}"/>
+</div>
+
+<h4>URLs dos cards</h4>
+<div class="form-group"><label>Cadastro de Produtos</label>
+  <input type="text" name="urlCadastroProdutos" value="${(params.urlCadastroProdutos!'#/cadastro-produtos')}"/>
+</div>
+<div class="form-group"><label>Solicitação de Compras</label>
+  <input type="text" name="urlSolicitacao" value="${(params.urlSolicitacao!'#/solicitacao-compras')}"/>
+</div>
+<div class="form-group"><label>Cotações</label>
+  <input type="text" name="urlCotacoes" value="${(params.urlCotacoes!'#/cotacoes')}"/>
+</div>
+<div class="form-group"><label>Pedidos</label>
+  <input type="text" name="urlPedidos" value="${(params.urlPedidos!'#/pedidos-compras')}"/>
+</div>
+<div class="form-group"><label>Notas Fiscais</label>
+  <input type="text" name="urlNotas" value="${(params.urlNotas!'#/notas-fiscais')}"/>
+</div>
+<div class="form-group"><label>Parâmetros</label>
+  <input type="text" name="urlParametros" value="${(params.urlParametros!'#/parametros')}"/>
+</div>
+
+<h4>(Opcional) Caminho das imagens</h4>
+<div class="form-group"><label>Icone Cadastro</label>
+  <input type="text" name="iconCadastroProdutos" value="${(params.iconCadastroProdutos!'')}"/>
+</div>
+<div class="form-group"><label>Icone Solicitação</label>
+  <input type="text" name="iconSolicitacao" value="${(params.iconSolicitacao!'')}"/>
+</div>
+<div class="form-group"><label>Icone Cotações</label>
+  <input type="text" name="iconCotacoes" value="${(params.iconCotacoes!'')}"/>
+</div>
+<div class="form-group"><label>Icone Pedidos</label>
+  <input type="text" name="iconPedidos" value="${(params.iconPedidos!'')}"/>
+</div>
+<div class="form-group"><label>Icone Notas</label>
+  <input type="text" name="iconNotas" value="${(params.iconNotas!'')}"/>
+</div>
+<div class="form-group"><label>Icone Parâmetros</label>
+  <input type="text" name="iconParametros" value="${(params.iconParametros!'')}"/>
+</div>
+
+</div>
+

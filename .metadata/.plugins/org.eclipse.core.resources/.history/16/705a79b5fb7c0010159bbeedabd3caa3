@@ -1,0 +1,48 @@
+function defineStructure() {
+    addColumn("status");   // Código HTTP ou "Erro"
+    addColumn("mensagem"); // Retorno da API ou sucesso
+    addColumn("erro");     // Mensagem de erro, se houver
+}
+
+function onSync(lastSyncDate) {}
+function onMobileSync(user) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/uf_mata010"; // relativo à URL base configurada no serviço
+    var method = "POST";
+    var params = "{}"; // corpo da requisição JSON
+
+    if (constraints) {
+        constraints.forEach(function(c) {
+            if (c.fieldName == "serviceCode") serviceCode = c.initialValue;
+            if (c.fieldName == "endpoint") endpoint = c.initialValue;
+            if (c.fieldName == "method") method = c.initialValue.toUpperCase();
+            if (c.fieldName == "params") params = c.initialValue;
+        });
+    }
+
+    var dataset = DatasetBuilder.newDataset();
+
+    try {
+        var serviceHelper = ServiceManager.getService(serviceCode);
+
+        // 👉 chamada direta usando invokeServiceJSON
+        var response = serviceHelper.invokeServiceJSON(
+            endpoint,              // endpoint relativo
+            params,                // corpo JSON
+            method,                // POST, GET, etc.
+            "application/json"     // Content-Type
+        );
+
+        log.info("Retorno Protheus: " + response);
+
+        dataset.addRow(["200", response, ""]);
+
+    } catch (e) {
+        log.error("Erro ao chamar Protheus: " + e);
+        dataset.addRow(["Erro", "", (e.message || e.toString())]);
+    }
+
+    return dataset;
+}

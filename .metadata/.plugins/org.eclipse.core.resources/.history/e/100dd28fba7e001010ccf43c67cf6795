@@ -1,0 +1,24 @@
+<div id="compras_${instanceId}" class="super-widget wcm-widget-class cd-root"
+     data-params="ComprasDigital.instance()">
+
+  <div class="cd-wrap">
+    <h2 class="cd-h2">${i18n.getTranslation('cd.title')!'Compras Digital'}</h2>
+    <p class="cd-sub">${i18n.getTranslation('cd.subtitle')!'Solução para simplificar as compras.'}</p>
+
+    <div class="cd-grid" id="cd-grid-${instanceId}">
+      <!-- os cards são renderizados via JS a partir da preferência "cards" -->
+    </div>
+  </div>
+
+  <!-- template do card -->
+  <script type="text/template" id="cd-card-tpl-${instanceId}">
+    <a class="cd-card" href="{{href}}" target="{{target}}">
+      <div class="cd-illus"><i class="fluigicon {{icon}} fluigicon-3x"></i></div>
+      <div class="cd-ttl">{{title}}</div>
+      <div class="cd-txt">{{text}}</div>
+    </a>
+  </script>
+</div>
+
+<link rel="stylesheet" type="text/css" href="/webdesk/vcXMLRPC?widgetID=${widgetId}&file=resources/css/cd.css"/>
+<script type="text/javascript" src="/webdesk/vcXMLRPC?widgetID=${widgetId}&file=resources/js/cd.js"></script>

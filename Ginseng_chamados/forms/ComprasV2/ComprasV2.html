@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Criar Solicitação de Compras</title>
+
+  <!-- Fluig SG + deps -->
+  <link rel="stylesheet" href="/style-guide/css/fluig-style-guide.min.css">
+  <link rel="stylesheet" href="/style-guide/css/fluig-style-guide-filter.min.css"> <!-- ADICIONE -->
+  <script src="/portal/resources/js/jquery/jquery.js"></script>
+  <script src="/portal/resources/js/jquery/jquery-ui.min.js"></script>
+  <script src="/style-guide/js/fluig-style-guide.min.js"></script>
+  <script src="/style-guide/js/fluig-style-guide-filter.min.js"></script> <!-- ADICIONE -->
+
+  <!-- seu JS/CSS -->
+  <link rel="stylesheet" href="form.css">
+  <script src="compras.js"></script>
+</head>
+
+<body>
+  <div class="fluig-style-guide">
+    <form name="form" role="form">
+
+      <div class="fs-display-block">
+
+        <!-- PAINEL: Dados da solicitação -->
+        <div class="panel panel-info">
+          <div class="panel-heading"><strong>Dados da Solicitação</strong></div>
+          <div class="panel-body">
+
+            <div class="row">
+              <div class="col-sm-6">
+                <label>Empresa</label>
+                <span class="required text-danger"><strong> * </strong></span>
+                <input type="zoom" class="form-control requiredInput" name="estabelecimento" id="estabelecimento"
+                  data-zoom="{
+												'displayKey':'LOJA',
+												'datasetId':'dsSysCompany',
+												'placeholder': 'Pesquisar por nome do estabelecimento.',
+												'fields':[
+													{
+														'field':'BPCS',
+														'label':'Filial',
+														'standard':'true',
+														'search':'true'
+													},
+                          {
+														'field':'DESCRICAO',
+														'label':'estabelecimento',
+														'search':'true'
+													}
+												]
+											}" />
+                <p class="text-danger text-error">
+                  Preenchimento obrigatório.
+                </p>
+              </div>
+
+              <div class="col-sm-2">
+                <label>Filial Entrega</label>
+                <input type="text" name="filialDesc" id="filialDesc" class="form-control zoom"
+                  placeholder="Selecione..." readonly>
+              </div>
+
+              <div class="col-sm-4">
+                <label>Tipo de Solicitação <span class="text-danger">*</span></label>
+                <select name="tipoSolicitacao" id="tipoSolicitacao" class="form-control" required>
+                  <option value="">Selecione</option>
+                  <option>Material</option>
+                  <option>Serviço</option>
+                </select>
+              </div>
+            </div>
+            <div class="row m-t-15">
+
+              <div class="col-sm-6">
+                <label>Produto/Serviço <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="hidden" name="produtoCod" id="produtoCod">
+                  <input type="text" name="produtoDesc" id="produtoDesc" class="form-control zoom" data-zoom="produto"
+                    placeholder="Buscar..." readonly required>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="btnBuscaProd">
+                      <span class="fluigicon fluigicon-search"></span>
+                    </button>
+                    <button class="btn btn-danger" type="button" id="btnLimpaProd">
+                      <span class="fluigicon fluigicon-trash"></span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="col-sm-2">
+                <label>Último Preço</label>
+                <input type="text" name="ultimoPreco" id="ultimoPreco" class="form-control text-right" value="0,00"
+                  readonly>
+              </div>
+              <div class="col-sm-2">
+                <label>Quantidade <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" id="qtdMenos">−</button>
+                  </span>
+                  <input type="number" min="0" step="1" name="quantidade" id="quantidade"
+                    class="form-control text-center" value="0" required>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" id="qtdMais">+</button>
+                  </span>
+                </div>
+              </div>
+              <div class="col-sm-2">
+                <label>Data da Necessidade <span class="text-danger">*</span></label>
+                <input type="text" name="dataNec" id="dataNec" class="form-control" placeholder="dd/mm/aaaa" required>
+              </div>
+
+            </div>
+
+            <div class="row m-t-10">
+              <div class="col-sm-6">
+                <label>Centro de Custo <span class="text-danger">*</span></label>
+                <input type="zoom" name="ccDesc" id="ccDesc" class="form-control" data-zoom="{
+                  'displayKey':'centroCusto',
+                  'datasetId':'ds_centroCusto',
+                  'placeholder': 'Pesquisar número ou nome do centro de custo.',
+                  'fields':[
+                    {
+                      'field':'codigoCentroCusto',
+                      'label':'Código',
+                      'standard':'true',
+                      'search':'true'
+                    },
+                    {
+                      'field':'centroCusto',
+                      'label':'Centro de custo',
+                      'search':'true'
+                    },
+                    {
+                      'field': 'gestorCentroCusto',
+                      'label': 'Gestor',
+                      'visible': 'false'
+                    },
+                    {
+                      'field': 'emailGestor',
+                      'label': 'Email do gestor',
+                      'visible': 'false'
+                    },
+                    {
+                      'field': 'idGestor',
+                      'label': 'Id do gestor',
+                      'visible': 'false'
+                    }
+                  ]
+                }" />
+              </div>
+
+              <div class="col-sm-3">
+                <label>Compra Emergencial?</label>
+                <select name="emergencial" id="emergencial" class="form-control">
+                  <option>Não</option>
+                  <option>Sim</option>
+                </select>
+              </div>
+
+              <div class="col-sm-3">
+                <label>Total</label>
+                <input type="text" name="total" id="total" class="form-control text-right" value="R$ 0,00" readonly>
+              </div>
+            </div> <!-- aqui sim fecha corretamente a row -->
+
+            <div class="row m-t-20">
+              <div class="col-sm-12">
+                <button type="button" class="btn btn-success" id="btnAddAnexo">
+                  <span class="fluigicon fluigicon-upload"></span> Adicionar Anexo
+                </button>
+              </div>
+              <div class="col-sm-12">
+                <label>Observação do Item</label>
+                <textarea name="obs" id="obs" class="form-control" rows="2"></textarea>
+              </div>
+            </div>
+
+            <div class="text-center m-t-15">
+              <button type="button" id="btnAddItem" class="btn btn-primary">
+                <span class="fluigicon fluigicon-add"></span> Adicionar Item
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PAINEL: Itens -->
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Itens</strong></div>
+          <div class="panel-body">
+            <table id="tbItens" tablename="tbItens" class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Centro de Custo</th>
+                  <th>Qtd</th>
+                  <th>Preço Ref.</th>
+                  <th>Total</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- LINHA MODELO (detail=true) -->
+                <tr class="tableRow" detail="true">
+                  <td>
+                    <input type="hidden" name="CodProd" class="form-control">
+                    <input type="text" name="DescProd" class="form-control" readonly>
+                  </td>
+                  <td>
+                    <input type="hidden" name="Codcc" class="form-control">
+                    <input type="text" name="Desccc" class="form-control" readonly>
+                  </td>
+                  <td><input type="number" name="qtd" class="form-control text-right" min="0" step="1" value="0"></td>
+                  <td><input type="text" name="Refpreco" class="form-control text-right" value="0,00"></td>
+                  <td><input type="text" name="totalProd" class="form-control text-right" value="R$ 0,00" readonly></td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-link" onclick="fnWdkRemoveChild(this)">
+                      <span class="fluigicon fluigicon-trash"></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>

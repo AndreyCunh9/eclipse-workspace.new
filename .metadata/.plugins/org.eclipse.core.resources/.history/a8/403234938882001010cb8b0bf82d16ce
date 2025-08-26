@@ -1,0 +1,96 @@
+function defineStructure() {
+	dataset.addColumn("codigo");
+    dataset.addColumn("descricao");
+    dataset.addColumn("CNPJ");
+    dataset.addColumn("ENDERECO");
+    dataset.addColumn("COMPLEMENTO");
+    dataset.addColumn("BAIRRO");
+    dataset.addColumn("CIDADE");
+    dataset.addColumn("ESTADO");
+    dataset.addColumn("CEP");
+    dataset.addColumn("CODIGO MUNICIPIO");
+    dataset.addColumn("BPCS");
+    dataset.addColumn("LOJA");
+
+}
+
+function onSync(lastSyncDate) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var dataset = DatasetBuilder.newDataset();
+    var dataSource = "/jdbc/ProtheusP12"; // Nome da conexão cadastrada no Fluig
+    var ic = new javax.naming.InitialContext();
+    var ds = ic.lookup(dataSource);
+    var conn = ds.getConnection();
+    var stmt = null;
+    var rs = null;
+
+    try {
+        log.info("Iniciando execução do dataset...");
+
+        var sql = "SELECT M0_CODFIL, M0_FILIAL, M0_CGC, M0_ENDENT, M0_COMPENT, M0_BAIRENT, M0_CIDENT, M0_ESTENT, M0_CEPENT, M0_CODMUN, M0_TEL_PO, * from SYS_COMPANY WHERE M0_CODFIL LIKE '0101%' OR M0_CODFIL LIKE'03%' AND D_E_L_E_T_= ''";
+        log.info("Query SQL: " + sql);
+
+        stmt = conn.prepareStatement(sql);
+        rs = stmt.executeQuery();
+
+        dataset.addColumn("CODIGO");
+        dataset.addColumn("DESCRICAO");
+        dataset.addColumn("CNPJ");
+        dataset.addColumn("ENDERECO");
+        dataset.addColumn("COMPLEMENTO");
+        dataset.addColumn("BAIRRO");
+        dataset.addColumn("CIDADE");
+        dataset.addColumn("ESTADO");
+        dataset.addColumn("CEP");
+        dataset.addColumn("CODIGO MUNICIPIO");
+        dataset.addColumn("BPCS");
+        dataset.addColumn("LOJA");
+
+
+
+        var encontrados = {}; // Usando um objeto para evitar duplicação
+
+        while (rs.next()) {
+            var codigo = rs.getString("M0_CODFIL");
+            var descricao = rs.getString("M0_FILIAL");
+            var cnpj = rs.getString("M0_CGC");
+            var endereco = rs.getString("M0_ENDENT");
+            var complemento = rs.getString("M0_COMPENT");
+            var bairro = rs.getString("M0_BAIRENT");
+            var cidade = rs.getString("M0_CIDENT");
+            var estado = rs.getString("M0_ESTENT");
+            var cep = rs.getString("M0_CEPENT");
+            var ibge = rs.getString("M0_CODMUN");
+            var bpcs = rs.getString("M0_TEL_PO");
+         // aqui monta a coluna nova
+            var loja = (bpcs ? bpcs : "") + " - " + (descricao ? descricao : "");
+
+
+            if (!encontrados[codigo]) { // Verifica se já foi adicionado
+                encontrados[codigo] = true; // Marca como processado
+                log.info("Registro encontrado: " + codigo + " - " + descricao);
+                dataset.addRow([codigo, descricao,cnpj,endereco,complemento,bairro,cidade,estado,cep,ibge, bpcs, loja]);
+            }
+        }
+
+        if (Object.keys(encontrados).length === 0) {
+            log.info("Nenhum registro encontrado para a consulta.");
+        }
+
+    } catch (e) {
+        log.error("Erro ao executar dataset: " + e.message);
+    } finally {
+        try {
+            if (rs) rs.close();
+            if (stmt) stmt.close();
+            if (conn) conn.close();
+        } catch (e) {
+            log.error("Erro ao fechar recursos: " + e.message);
+        }
+    }
+
+    return dataset;
+}
+
+function onMobileSync(user) {}

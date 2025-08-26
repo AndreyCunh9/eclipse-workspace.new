@@ -1,0 +1,62 @@
+function defineStructure() {
+
+}
+function onSync(lastSyncDate) {
+
+}
+function createDataset(fields, constraints, sortFields) {
+    var dataset = DatasetBuilder.newDataset();
+
+    // Definição das colunas
+    dataset.addColumn("nomeItem");
+    dataset.addColumn("ultimaCompra");
+
+    try {
+        var documentId = 332; // 🟢 SUBSTITUA pelo ID do arquivo no GED
+
+        // Obtém o serviço de documentos
+        var documentService = fluigAPI.getDocumentService();
+        var document = documentService.getDocumentMetadata(documentId);
+
+        // Pega a URL pública do documento no GED
+        var documentURL = document.getDocumentDescription();
+        
+        if (!documentURL) {
+            dataset.addRow(["Erro", "URL do documento não encontrada"]);
+            return dataset;
+        }
+
+        // Baixa o conteúdo do arquivo usando HTTP
+        var client = new javax.net.ssl.HttpsURLConnection(new java.net.URL(documentURL).openConnection());
+        client.setRequestMethod("GET");
+        client.setDoOutput(true);
+        client.connect();
+
+        var inputStream = client.getInputStream();
+        var workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook(inputStream);
+        var sheet = workbook.getSheetAt(0); // Pega a primeira aba do Excel
+        var iterator = sheet.iterator();
+
+        iterator.next(); // Pular cabeçalho
+
+        while (iterator.hasNext()) {
+            var row = iterator.next();
+            dataset.addRow([
+                row.getCell(0) ? row.getCell(0).toString() : "", // nomeItem
+                row.getCell(1) ? row.getCell(1).toString() : ""  // ultimaCompra
+            ]);
+        }
+
+        workbook.close();
+        inputStream.close();
+    } catch (e) {
+        dataset.addRow(["Erro", e.message]);
+    }
+
+    return dataset;
+}
+
+
+function onMobileSync(user) {
+
+}

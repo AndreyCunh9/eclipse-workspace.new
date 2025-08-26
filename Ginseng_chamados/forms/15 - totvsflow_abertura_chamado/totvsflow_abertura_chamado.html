@@ -1,0 +1,848 @@
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/style-guide/css/fluig-style-guide.min.css"
+    />
+
+    <script src="/resources/js/jquery/jquery.js"></script>
+    <script src="/resources/js/jquery/jquery-ui.min.js"></script>
+    <script src="/resources/js/mustache/mustache-min.js"></script>
+    <script src="/style-guide/js/fluig-style-guide.min.js"></script>
+    <script type="text/javascript" src="/webdesk/vcXMLRPC.js"></script>
+    <link
+      href="/webdesk/customresources?cid=4&resourceName=temaFormulario/0.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/style-guide/css/fluig-style-guide-ratingstars.min.css"
+    />
+    <script src="/style-guide/js/fluig-style-guide-ratingstars.min.js"></script>
+
+    <style>
+      h6 {
+        color: #afb0b3 !important;
+        font-weight: normal !important;
+      }
+      h2 {
+        color: #008ac4 !important;
+        display: flex !important;
+        flex-direction: row !important;
+      }
+      h2:after {
+        content: "" !important;
+        flex: 1 1 !important;
+        border-bottom: 2px solid #008ac4 !important;
+        margin: auto !important;
+      }
+      .flaticon-account-box {
+        color: #008ac4 !important;
+      }
+      #rcorners {
+        height: 110px;
+        line-height: 110px;
+        color: white;
+        border-radius: 0px 0px 50px 50px;
+        background: rgb(0, 138, 192);
+        background: linear-gradient(
+          90deg,
+          rgba(0, 138, 192, 1) 0%,
+          rgba(2, 166, 189, 1) 50%,
+          rgba(1, 192, 181, 1) 100%
+        );
+        text-align: center !important;
+      }
+      .change-weight {
+        font-weight: 400 !important;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+
+      .consegueResolverMotivo .textoAuxiliar {
+        width: 100%;
+        color: #8c8d8f;
+        font-size: 12px;
+        margin-left: 1.5em;
+        font-weight: 400;
+      }
+
+      .ratingStars {
+        display: flex;
+        align-items: center;
+        height: 50px;
+      }
+
+      .ratingStars .minha-avaliacao {
+        margin: 0 20px;
+        color: #f0ad4e;
+      }
+    </style>
+
+    <script>
+      //show the activity and then block the fields
+      function showAndBlock(activity) {
+        for (var i = 0, l = activity.length; i < l; i++) {
+          $(".activity-" + activity[i]).show();
+          //remove buttons
+          $(".hideButton").hide();
+          //use an each to block everything inside the class activity-X
+          $(".activity-" + activity[i] + " :input").each(function () {
+            $(this).attr("readonly", "readonly");
+            $(this).on("mousedown", function (e) {
+              this.blur();
+              window.focus();
+            });
+
+            if ($(this).is(":checkbox")) {
+              $(this).attr("disabled", true);
+            } else if ($(this).is(":radio")) {
+              $(this).on("click", function () {
+                return false;
+              });
+            }
+          });
+        }
+      }
+
+      function getCurrentDate() {
+        var newDate = new Date();
+        var h = newDate.getHours();
+        if (h < 10) {
+          h = "0" + h;
+        }
+        var m = newDate.getMinutes();
+        if (m < 10) {
+          m = "0" + m;
+        }
+        var hour = h + ":" + m; // + ":" + s;
+        var day = newDate.getDate();
+        if (day < 10) {
+          day = "0" + day;
+        }
+        var month = newDate.getMonth() + 1;
+        if (month < 10) {
+          month = "0" + month;
+        }
+        newDate = day + "/" + month + "/" + newDate.getFullYear();
+        var currentDate = [newDate, hour];
+        return currentDate;
+      }
+
+      var beforeSendValidate = function (numState, nextState) {
+        // return true;
+        if (numState == 0 || numState == 1) {
+          if ($("#tipoOcorrencia").val() == "") {
+            throw "'Tipo da ocorrência' é obrigatório.";
+          } else if ($("#tituloOcorrencia").val() == "") {
+            throw "'Título da ocorrência' é obrigatório.";
+          } else if ($("#detalheSolicitacao").val() == "") {
+            throw "'Detalhamento da situação' é obrigatório.";
+          }
+        } else if (numState == 2) {
+          if (
+            $("input[name='consegueResolver']:checked").val() == "" ||
+            $("input[name='consegueResolver']:checked").val() == undefined
+          ) {
+            throw "'Consegue resolver?' é obrigatório.";
+          } else if (
+            $("input[name='consegueResolver']:checked").val() == "nao"
+          ) {
+            if (
+              $("input[name='possuiInconsistencia']:checked").val() == "" ||
+              $("input[name='possuiInconsistencia']:checked").val() == undefined
+            ) {
+              throw "'Qual o motivo?' é obrigatório.";
+            }
+          }
+          if ($("#consideracoesTecnicas").val() == "") {
+            throw "'Considerações' é obrigatório.";
+          }
+        } else if (numState == 6) {
+          if ($("#detalheSolicitacao").val() == "") {
+            throw "'Detalhamento da situação' é obrigatório.";
+          }
+        } else if (numState == 11) {
+          if (
+            $("input[name='situacaoResolvida']:checked").val() == "" ||
+            $("input[name='situacaoResolvida']:checked").val() == undefined
+          ) {
+            throw "'Situação resolvida?' é obrigatório.";
+          } else if (
+            $("input[name='situacaoResolvida']:checked").val() == "nao"
+          ) {
+            if ($("#consideracoes").val() == "") {
+              throw "'Considerações' é obrigatório.";
+            }
+          }
+        }
+      };
+
+      function setSelectedZoomItem(selectedItem) {
+        if (selectedItem.inputName == "nomeGestorArea") {
+          $("#emailGestorArea").val(selectedItem.emailGestor);
+        }
+      }
+
+      function removedZoomItem(removedItem) {
+        console.log("removedItem", removedItem);
+        if (removedItem.inputName == "nomeGestorArea") {
+          $("#emailGestorArea").val("");
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="fluig-style-guide" style="background-color: white">
+      <form>
+        <div style="display: none">
+          <input type="text" id="WKNumProces" name="WKNumProces" />
+          <input type="text" id="activity" name="activity" />
+          <input type="text" id="formMode" name="formMode" />
+
+          <!-- requester -->
+          <input type="text" id="requesterMail" name="requesterMail" />
+          <input type="text" id="requesterId" name="requesterId" />
+
+          <!-- current user -->
+          <input type="text" id="currentUserName" name="currentUserName" />
+          <input type="text" id="currentUsermail" name="currentUsermail" />
+          <input type="text" id="currentUserId" name="currentUserId" />
+        </div>
+
+        <h1 id="rcorners">Abertura de chamado</h1>
+
+        <div class="container activity-all">
+          <div class="activity activity-0 activity-1 activity-6">
+            <div>
+              <br />
+              <h2>
+                <i class="flaticon flaticon-account-box" aria-hidden="true"></i>
+                &nbsp;Dados gerais &nbsp;
+              </h2>
+              <h6>
+                Estes são os dados referentes aos responsáveis pela abertura e
+                pela solicitação do atual processo.
+              </h6>
+              <br />
+            </div>
+
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-10 col-xs-6">
+                    <label for="requesterName"> Usuário de abertura </label>
+                    <input
+                      type="text"
+                      name="requesterName"
+                      id="requesterName"
+                      class="form-control"
+                      readonly
+                      data-protection="Usuário de abertura"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-name
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                  <div class="form-group col-md-2 col-xs-6">
+                    <label for="dataAbertura"> Data </label>
+                    <input
+                      type="text"
+                      name="dataAbertura"
+                      id="dataAbertura"
+                      class="form-control"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-6 col-xs-12">
+                    <label for="userSolicitante"> Usuário solicitante </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="userSolicitante"
+                      id="userSolicitante"
+                      placeholder="Insira o nome completo do solicitante. Ex.: João da Silva"
+                      data-protection="Usuário solicitante"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-name
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                  <div class="form-group col-md-6 col-xs-12">
+                    <label for="emailSolicitante">
+                      E-mail do solicitante
+                    </label>
+                    <input
+                      type="email"
+                      name="emailSolicitante"
+                      id="emailSolicitante"
+                      class="form-control"
+                      placeholder="Insira o e-mail do solicitante. Ex.: Joaodasilva@email.com.br"
+                      data-protection="E-mail do solicitante"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-mail
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-6 col-xs-12">
+                    <label for="nomeGestorArea"> Gestor da área </label>
+                    <input
+                      type="zoom"
+                      class="form-control"
+                      name="nomeGestorArea"
+                      id="nomeGestorArea"
+                      placeholder="Pesquise o nome do gestor"
+                      data-zoom="{
+												'displayKey':'gestorCentroCusto',
+												'datasetId':'ds_centroCusto',
+												'fields':[
+													{
+														'field':'gestorCentroCusto',
+														'label':'Nome',
+														'standard':'true',
+														'search':'true'
+													},
+													{
+														'field':'emailGestor',
+														'label':'E-mail',
+														'search':'true'
+													}
+												]
+											}"
+                      data-protection="Gestor da área"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-other
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                  <div class="form-group col-md-6 col-xs-6">
+                    <label for="emailGestorArea"> E-mail do gestor </label>
+                    <input
+                      type="text"
+                      name="emailGestorArea"
+                      id="emailGestorArea"
+                      class="form-control"
+                      readonly
+                      data-protection="E-mail do gestor"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-mail
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-6 col-xs-12">
+                    <label for="estabelecimento">
+                      Estabelecimento/Filial
+                    </label>
+                    <span class="required text-danger"><strong> * </strong></span>
+                    <input type="zoom" class="form-control requiredInput" name="estabelecimento" id="estabelecimento"
+                      data-zoom="{
+                          'displayKey':'estabelecimento',
+                          'datasetId':'dsFiliais',
+                          'placeholder': 'Pesquisar nome do estabelecimento ou filial.',
+                          'fields':[
+                            {
+                              'field':'estabelecimento',
+                              'label':'Filial',
+                              'standard':'true',
+                              'search':'true'
+                            }
+                          ]
+                        }" />
+                    <p class="text-danger text-error">
+                      Preenchimento obrigatório.
+                    </p>
+                  </div>
+                  <div class="form-group col-md-6 col-xs-6">
+                    <label for="complemento"> Complemento </label>
+                    <input
+                      type="text"
+                      name="complemento"
+                      id="complemento"
+                      class="form-control"
+                      placeholder="Prédio, Bloco, Andar, Mesa"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <br />
+              <h2>
+                <i class="flaticon flaticon-settings" aria-hidden="true"></i>
+                &nbsp;Dados Técnicos &nbsp;
+              </h2>
+              <h6>Insira abaixo os itens necessários para o solicitante.</h6>
+              <br />
+            </div>
+
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-6 col-xs-12">
+                    <label for="tipoOcorrencia"> Tipo da Ocorrência </label>
+                    <span class="required text-danger"
+                      ><strong> * </strong></span
+                    >
+                    <input
+                      type="zoom"
+                      class="form-control"
+                      name="tipoOcorrencia"
+                      id="tipoOcorrencia"
+                      data-zoom="{
+												'displayKey':'nomeOcorrencia',
+												'datasetId':'ds_Ocorrencias',
+												'fields':[
+													{
+														'field':'nomeOcorrencia',
+														'label':'Tipo',
+														'standard':'true',
+														'search':'true'
+													}
+												]
+											}"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-6 col-xs-12">
+                    <label for="tituloOcorrencia"> Título da ocorrência </label>
+                    <span class="text-danger"><strong>*</strong></span>
+                    <input
+                      type="text"
+                      name="tituloOcorrencia"
+                      id="tituloOcorrencia"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label for="detalheSolicitacao"
+                      >Detalhamento da situação</label
+                    >
+                    <span class="text-danger"><strong>*</strong></span>
+                    <textarea
+                      class="form-control"
+                      name="detalheSolicitacao"
+                      id="detalheSolicitacao"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity activity-2">
+            <div>
+              <br />
+              <h2>
+                <i
+                  class="flaticon flaticon-check-circle"
+                  aria-hidden="true"
+                ></i>
+                &nbsp;Análise&nbsp;
+              </h2>
+              <br />
+            </div>
+
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-10 col-xs-6">
+                    <label for="analistaTecnico"> Analista </label>
+                    <input
+                      type="text"
+                      name="analistaTecnico"
+                      id="analistaTecnico"
+                      class="form-control"
+                      readonly
+                      data-protection="Analista"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-name
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                  <div class="form-group col-md-2 col-xs-6">
+                    <label for="dataAnaliseTecnica"> Data </label>
+                    <input
+                      type="text"
+                      name="dataAnaliseTecnica"
+                      id="dataAnaliseTecnica"
+                      class="form-control"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label>Consegue resolver?</label>
+                    <span class="text-danger"><strong>*</strong></span
+                    ><br />
+                    <div class="radio-inline">
+                      <label>
+                        <input
+                          name="consegueResolver"
+                          id="consegueResolverSim"
+                          value="sim"
+                          type="radio"
+                        />
+                        <span class="change-weight">Sim</span>
+                      </label>
+                    </div>
+                    <div class="radio-inline">
+                      <label>
+                        <input
+                          name="consegueResolver"
+                          id="consegueResolverNao"
+                          value="nao"
+                          type="radio"
+                        />
+                        <span class="change-weight">Não</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row consegueResolverMotivo">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label>Qual o motivo?</label>
+                    <span class="text-danger"><strong>*</strong></span
+                    ><br />
+                    <div class="">
+                      <label>
+                        <input
+                          name="possuiInconsistencia"
+                          id="possuiInconsistenciaNao"
+                          value="nao"
+                          type="radio"
+                        />
+                        <span class="change-weight"
+                          >A atual solicitação <b>carece de informações</b>, o
+                          que limita o entendimento da real necessidade do
+                          usuário</span
+                        >
+                        <p class="textoAuxiliar">
+                          Esta opção retorna a atual solicitação ao usuário
+                          solicitante, a fim de que este atualize o formulário
+                          com as informações faltantes.
+                        </p>
+                      </label>
+                    </div>
+                    <div class="">
+                      <label>
+                        <input
+                          name="possuiInconsistencia"
+                          id="possuiInconsistenciaSim"
+                          value="sim"
+                          type="radio"
+                        />
+                        <span class="change-weight"
+                          >A atual solicitação <b>possui inconsistências</b> que
+                          impedem sua movimentação</span
+                        >
+                        <p class="textoAuxiliar">
+                          Esta opção encerra automaticamente a atual
+                          solicitação.
+                        </p>
+                      </label>
+                    </div>
+                    <div class="">
+                      <label>
+                        <input
+                          name="possuiInconsistencia"
+                          id="precisaSuprimentos"
+                          value="suprimentos"
+                          type="radio"
+                        />
+                        <span class="change-weight"
+                          >A atual solicitação <b>carece de suprimentos</b>, o
+                          que limita o atendimento da necessidade do
+                          usuário</span
+                        >
+                        <p class="textoAuxiliar">
+                          Esta opção envia a atual solicitação ao <b>Setor de Compras</b>, a fim de que este realize as devidas aquisições. 
+                          Ao indicar esta opção, será necessário informar os itens que precisará serem comprados.
+                        </p>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label for="consideracoesTecnicas">Considerações</label>
+                    <span class="text-danger"><strong>*</strong></span>
+                    <textarea
+                      class="form-control"
+                      name="consideracoesTecnicas"
+                      id="consideracoesTecnicas"
+                      placeholder="Descreva a justificativa para a sua análise"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity activity-11">
+            <div>
+              <br />
+              <h2>
+                <i
+                  class="flaticon flaticon-check-circle"
+                  aria-hidden="true"
+                ></i>
+                &nbsp;Validação do serviço &nbsp;
+              </h2>
+              <br />
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-10 col-xs-6">
+                    <label for="userValidacao"> Usuário de abertura </label>
+                    <input
+                      type="text"
+                      name="userValidacao"
+                      id="userValidacao"
+                      class="form-control"
+                      readonly
+                      data-protection="Usuário de abertura"
+                      data-protection-anonymizable
+                      data-protection-sensitive
+                      data-protection-name
+                      data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    />
+                  </div>
+                  <div class="form-group col-md-2 col-xs-6">
+                    <label for="dataUserValidacao"> Data </label>
+                    <input
+                      type="text"
+                      name="dataUserValidacao"
+                      id="dataUserValidacao"
+                      class="form-control"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label>Situação resolvida?</label>
+                    <span class="text-danger"><strong>*</strong></span
+                    ><br />
+                    <div class="radio-inline">
+                      <label>
+                        <input
+                          name="situacaoResolvida"
+                          id="situacaoResolvidaSim"
+                          value="sim"
+                          type="radio"
+                        />
+                        <span class="change-weight">Sim</span>
+                      </label>
+                    </div>
+                    <div class="radio-inline">
+                      <label>
+                        <input
+                          name="situacaoResolvida"
+                          id="situacaoResolvidaNao"
+                          value="nao"
+                          type="radio"
+                        />
+                        <span class="change-weight">Não</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row ratingAction">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label>Como você avalia o atendimento?</label>
+                    <div class="ratingStars">
+                      <span>Péssimo</span>
+                      <div class="minha-avaliacao"></div>
+                      <span>Excelente</span>
+                    </div>
+                    <input type="hidden" id="ratingValue" name="ratingValue" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row explainAction">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12">
+                    <label for="consideracoes">Considerações</label>
+                    <span class="text-danger"><strong>*</strong></span>
+                    <textarea
+                      class="form-control"
+                      name="consideracoes"
+                      id="consideracoes"
+                      placeholder="Descreva a justificativa para a sua avaliação"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+
+  <script>
+    var ratingStars;
+    var servicoNaoValidado =
+      $("input[name=situacaoResolvida]:checked").val() == "nao";
+    $(document).ready(function () {
+      if ($("#formMode").val() == "VIEW") {
+        showAndBlock([0, 2, 11]);
+        $(".ratingAction").hide();
+        if ($("input[name=situacaoResolvida]:checked").val() == "sim") {
+          $(".ratingAction").show();
+        }
+        let ratingValue;
+        if ($("#ratingValue").val() == "" || $("#ratingValue").val() == 0) {
+          ratingValue = 0;
+        } else {
+          ratingValue = $("#ratingValue").val();
+        }
+        let html = "";
+        for (let i = 0; i < 5; i++) {
+          if (i < ratingValue) {
+            html +=
+              '<i class="flaticon flaticon-star-active icon-md" aria-hidden="true"></i>';
+          } else {
+            html +=
+              '<i class="flaticon flaticon-star icon-md" aria-hidden="true"></i>';
+          }
+        }
+        console.log(html);
+        $(".minha-avaliacao").html(html);
+      } else {
+        //show the right fields
+        var activity = $("#activity").val();
+        var requestDate = getCurrentDate();
+
+        $(".activity").hide();
+        $(".activity-" + activity).show();
+
+        if (activity == 0) {
+          //primeira atividade
+          $("#dataAbertura").val(requestDate[0] + " - " + requestDate[1]);
+        } else if (activity == 2) {
+          if (servicoNaoValidado) {
+            showAndBlock([0, 11]);
+          } else {
+            showAndBlock([0]);
+            $("#analistaTecnico").val($("#currentUserName").val());
+            $("#dataAnaliseTecnica").val(
+              requestDate[0] + " - " + requestDate[1]
+            );
+          }
+        } else if (activity == 11) {
+          showAndBlock([0, 2]);
+          let ratingValue;
+          if ($("#ratingValue").val() == "" || $("#ratingValue").val() == 0) {
+            ratingValue = 0;
+          } else {
+            ratingValue = $("#ratingValue").val();
+          }
+          ratingStars = FLUIGC.stars(".minha-avaliacao", {
+            stars: 5,
+            value: ratingValue,
+            sizeClass: "icon-md",
+          });
+          ratingStars.on("click", (obj) => {
+            let countCurrentRating = 0;
+            $(".fluigicon-star").each(() => {
+              countCurrentRating++;
+            });
+            $("#ratingValue").val(countCurrentRating);
+          });
+          $("#userValidacao").val($("#currentUserName").val());
+          $("#dataUserValidacao").val(requestDate[0] + " - " + requestDate[1]);
+        } else if (activity == 6) {
+          showAndBlock([1, 2]);
+          $("#detalheSolicitacao").attr("readonly", false);
+        }
+
+        $("input[name=consegueResolver]").on("change", function () {
+          $(".consegueResolverMotivo").hide();
+          if ($(`input[name=${$(this).attr("name")}]:checked`).val() == "nao")
+            $(".consegueResolverMotivo").show();
+        });
+        $("input[name=consegueResolver]").trigger("change");
+
+        $("input[name=situacaoResolvida]").on("change", function () {
+          $(".explainAction, .ratingAction").hide();
+          if ($("input[name=situacaoResolvida]:checked").val() == "nao") {
+            $(".explainAction").show();
+          } else if (
+            $("input[name=situacaoResolvida]:checked").val() == "sim"
+          ) {
+            $(".ratingAction").show();
+          }
+        });
+        $("input[name=situacaoResolvida]").trigger("change");
+      }
+    });
+  </script>
+</html>

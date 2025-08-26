@@ -1,0 +1,20 @@
+function createDataset(fields, constraints, sortFields) {
+	
+	
+	var servicoURL = "http://187.72.204.233:8089/rest/api/retail/v1/retailitem?Fields=Code,Description,LastPurchasePrice"
+	
+	var myApiConsumer = oauthUtil.getGenericConsumer("","", "","");
+	var data = myApiConsumer.get(servicoURL);
+	
+	var dataset = DatasetBuilder.newDataset();
+	
+	var objdata = JSON.parse(data);
+	
+	dataset.addColumn('Código');
+	dataset.addColumn('Descrição');
+	dataset.addColumn('último preço');
+	
+	dataset.addRow([objdata['Código'], objdata['Descrição'], objdata['Último Preço']]);
+	
+	return dataset;
+}

@@ -1,0 +1,172 @@
+<html>
+
+<head>
+	<link type="text/css" rel="stylesheet" href="/style-guide/css/fluig-style-guide.min.css" />
+	<script type="text/javascript" src="/portal/resources/js/jquery/jquery.js"></script>
+	<script type="text/javascript" src="/portal/resources/js/jquery/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/portal/resources/js/mustache/mustache-min.js"></script>
+	<script type="text/javascript" src="/style-guide/js/fluig-style-guide.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="compras.js"></script>
+
+</head>
+
+<body>
+	<div class="fluig-style-guide">
+		<form name="form" role="form">
+			<link rel="stylesheet" type="text/css" href="/style-guide/css/fluig-style-guide.min.css">
+
+			<div class="fluig-style-guide fs-display-block">
+
+				<div class="panel panel-info">
+					<div class="panel-heading"><strong>Dados da Solicitação</strong></div>
+					<div class="panel-body">
+
+						<div class="row">
+							<div class="col-sm-6">
+								<label>Empresa</label>
+								<input type="hidden" name="empresaCodigo" id="empresaCodigo">
+								<input type="text" name="empresaDesc" id="empresaDesc" class="form-control zoom"
+									data-zoom="empresa" placeholder="Selecione..." readonly>
+							</div>
+
+							<div class="col-sm-6">
+								<label>Filial</label>
+								<input type="hidden" name="filialCodigo" id="filialCodigo">
+								<input type="text" name="filialDesc" id="filialDesc" class="form-control zoom"
+									data-zoom="filial" placeholder="Selecione..." readonly>
+							</div>
+						</div>
+
+						<div class="row m-t-15">
+							<div class="col-sm-4">
+								<label>Tipo de Solicitação <span class="text-danger">*</span></label>
+								<select name="tipoSolicitacao" id="tipoSolicitacao" class="form-control" required>
+									<option value="">Selecione</option>
+									<option>Material</option>
+									<option>Serviço</option>
+								</select>
+							</div>
+
+							<div class="col-sm-8">
+								<label>Produto/Serviço <span class="text-danger">*</span></label>
+								<div class="input-group">
+									<input type="hidden" name="produtoCod" id="produtoCod">
+									<input type="text" name="produtoDesc" id="produtoDesc" class="form-control zoom"
+										data-zoom="produto" placeholder="Buscar..." readonly required>
+									<span class="input-group-btn">
+										<button class="btn btn-default" type="button" id="btnBuscaProd"><span
+												class="fluigicon fluigicon-search"></span></button>
+										<button class="btn btn-danger" type="button" id="btnLimpaProd"><span
+												class="fluigicon fluigicon-trash"></span></button>
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="row m-t-10">
+							<div class="col-sm-3">
+								<label>Último Preço</label>
+								<input type="text" name="ultimoPreco" id="ultimoPreco" class="form-control text-right"
+									readonly value="0,00">
+							</div>
+
+							<div class="col-sm-3">
+								<label>Preço de Referência</label>
+								<input type="text" name="precoRef" id="precoRef" class="form-control text-right"
+									value="0,00">
+							</div>
+
+							<div class="col-sm-3">
+								<label>Quantidade <span class="text-danger">*</span></label>
+								<div class="input-group">
+									<span class="input-group-btn"><button type="button" class="btn btn-default"
+											id="qtdMenos">−</button></span>
+									<input type="number" min="0" step="1" name="quantidade" id="quantidade"
+										class="form-control text-center" value="0" required>
+									<span class="input-group-btn"><button type="button" class="btn btn-default"
+											id="qtdMais">+</button></span>
+								</div>
+							</div>
+
+							<div class="col-sm-3">
+								<label>Data da Necessidade <span class="text-danger">*</span></label>
+								<input type="text" name="dataNec" id="dataNec" class="form-control"
+									placeholder="dd/mm/aaaa" required>
+							</div>
+						</div>
+
+						<div class="row m-t-10">
+							<div class="col-sm-6">
+								<label>Centro de Custo <span class="text-danger">*</span></label>
+								<input type="hidden" name="ccCod" id="ccCod">
+								<input type="text" name="ccDesc" id="ccDesc" class="form-control zoom"
+									data-zoom="centrocusto" placeholder="Selecione..." readonly required>
+							</div>
+
+							<div class="col-sm-3">
+								<label>Compra Emergencial?</label>
+								<select name="emergencial" id="emergencial" class="form-control">
+									<option>Não</option>
+									<option>Sim</option>
+								</select>
+							</div>
+
+							<div class="col-sm-3">
+								<label>Total</label>
+								<input type="text" name="total" id="total" class="form-control text-right" readonly
+									value="R$ 0,00">
+							</div>
+						</div>
+
+						<div class="row m-t-15">
+							<div class="col-sm-12">
+								<button type="button" class="btn btn-success" id="btnAddAnexo">
+									<span class="fluigicon fluigicon-upload"></span> Adicionar Anexo
+								</button>
+								<!-- o componente de anexos padrão do Fluig aparece automaticamente no cabeçalho; esse botão é opcional -->
+							</div>
+						</div>
+
+						<div class="row m-t-10">
+							<div class="col-sm-12">
+								<label>Observação do Item</label>
+								<textarea name="obs" id="obs" class="form-control" rows="3"></textarea>
+							</div>
+						</div>
+
+						<div class="text-center m-t-15">
+							<button type="button" id="btnAddItem" class="btn btn-primary">
+								<span class="fluigicon fluigicon-add"></span> Adicionar Item
+							</button>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>Itens</strong></div>
+					<div class="panel-body">
+						<table id="tbItens" tablename="tbItens" class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Produto</th>
+									<th>Centro de Custo</th>
+									<th>Qtd</th>
+									<th>Preço Ref.</th>
+									<th>Total</th>
+									<th>Ação</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- linhas filhos via wdkAddChild -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
+
+		</form>
+	</div>
+</body>
+</html>

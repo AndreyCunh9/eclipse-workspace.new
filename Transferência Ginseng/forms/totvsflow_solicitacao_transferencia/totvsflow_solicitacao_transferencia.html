@@ -1,0 +1,876 @@
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="/style-guide/css/fluig-style-guide.min.css" />
+
+  <script src="/resources/js/jquery/jquery.js"></script>
+  <script src="/resources/js/jquery/jquery-ui.min.js"></script>
+  <script src="/resources/js/mustache/mustache-min.js"></script>
+  <script src="/style-guide/js/fluig-style-guide.min.js"></script>
+  <script type="text/javascript" src="/webdesk/vcXMLRPC.js"></script>
+  <script type="text/javascript" src="script.js"></script>
+  <script type="text/javascript" src="excel.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+
+  <style>
+    h6 {
+      color: #afb0b3 !important;
+      font-weight: normal !important;
+    }
+
+    h2 {
+      color: #008ac4 !important;
+      display: flex !important;
+      flex-direction: row !important;
+    }
+
+    h2:after {
+      content: "" !important;
+      flex: 1 1 !important;
+      border-bottom: 2px solid #008ac4 !important;
+      margin: auto !important;
+    }
+
+    .flaticon {
+      color: #008ac4 !important;
+    }
+
+    #rcorners {
+      height: 110px;
+      line-height: 110px;
+      color: white;
+      border-radius: 0px 0px 50px 50px;
+      background: rgb(0, 138, 192);
+      background: linear-gradient(90deg,
+          rgba(0, 138, 192, 1) 0%,
+          rgba(2, 166, 189, 1) 50%,
+          rgba(1, 192, 181, 1) 100%);
+      text-align: center !important;
+    }
+
+    .change-weight {
+      font-weight: 400 !important;
+    }
+
+    .asteristicWarning {
+      color: #000000 !important;
+      margin-top: 50px !important;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .errorValidate .requiredInput,
+    .errorValidate .select2 {
+      border: 2px solid #cc3d3d !important;
+    }
+
+    .text-error {
+      font-size: 10px;
+      margin: 0;
+      display: none;
+    }
+
+    .errorValidate .text-error {
+      display: block;
+    }
+
+    input.select2-search__field::placeholder {
+      color: #afb0b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="fluig-style-guide" style="background-color: white">
+    <form>
+      <div style="display: none">
+        <input type="text" id="WKNumProces" name="WKNumProces" />
+        <input type="text" id="activity" name="activity" />
+        <input type="text" id="formMode" name="formMode" />
+
+        <!-- requester -->
+        <input type="text" id="requesterMail" name="requesterMail" />
+        <input type="text" id="requesterId" name="requesterId" />
+
+        <!-- current user -->
+        <input type="text" id="currentUserName" name="currentUserName" />
+        <input type="text" id="currentUsermail" name="currentUsermail" />
+        <input type="text" id="currentUserId" name="currentUserId" />
+
+        <input type="text" id="gestor_cc" name="gestor_cc" />
+        <input type="text" id="gestor_cce" name="gestor_cce" />
+      </div>
+
+      <h1 id="rcorners">Solicitação de Transferência</h1>
+
+      <div class="container activity-all">
+        <div class="activity activity-0 activity-1">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-account-box" aria-hidden="true"></i>
+              &nbsp;Dados gerais &nbsp;
+            </h2>
+            <h6>
+              Dados referentes aos responsáveis pela abertura e pela
+              solicitação do atual processo.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="requesterName"> Usuário de abertura </label>
+                  <input type="text" name="requesterName" id="requesterName" class="form-control"
+                    data-protection="Usuário de abertura" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataAbertura"> Data </label>
+                  <input type="text" name="dataAbertura" id="dataAbertura" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="userSolicitante"> Analista solicitante </label>
+                  <input placeholder="Inserir nome solicitante." type="text" class="form-control" name="userSolicitante"
+                    id="userSolicitante" data-protection="Usuário solicitante" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo" />
+                </div>
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="emailSolicitante">
+                    E-mail do solicitante
+                  </label>
+                  <input placeholder="Inserir e-mail do solicitante. Ex.: Joaodasilva@email.com.br" type="text"
+                    name="emailSolicitante" id="emailSolicitante" class="form-control"
+                    data-protection="E-mail do solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-mail
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="estabelecimento">
+                    Filial Emitente
+                  </label>
+                  <span class="required text-danger"><strong> * </strong></span>
+                  <input type="zoom" class="form-control requiredInput" name="estabelecimento" id="estabelecimento"
+                    data-zoom="{
+												'displayKey':'centroCusto',
+												'datasetId':'ds_LojasTransf',
+												'placeholder': 'Pesquisar nome do estabelecimento ou filial.',
+												'fields':[
+													{
+														'field':'codigoCentroCusto',
+														'label':'Código',
+														'standard':'true',
+														'search':'true'
+													},
+													{
+														'field':'centroCusto',
+														'label':'Centro de custo',
+														'search':'true'
+													},
+                          {
+                            'field': 'gestorCentroCusto',
+                            'label': 'Gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'emailGestor',
+                            'label': 'Email do gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'idGestor',
+                            'label': 'Id do gestor',
+                            'visible': 'false'
+                          }
+												]
+											}" />
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="centroCusto"> Filial Destino </label>
+                  <input type="zoom" class="form-control" name="centroCusto" id="centroCusto" data-zoom="{
+												'displayKey':'centroCusto',
+												'datasetId':'ds_LojasTransf',
+												'placeholder': 'Pesquisar número ou nome do centro de custo.',
+												'fields':[
+													{
+														'field':'codigoCentroCusto',
+														'label':'Código',
+														'standard':'true',
+														'search':'true'
+													},
+													{
+														'field':'centroCusto',
+														'label':'Centro de custo',
+														'search':'true'
+													},
+                          {
+                            'field': 'gestorCentroCusto',
+                            'label': 'Gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'emailGestor',
+                            'label': 'Email do gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'idGestor',
+                            'label': 'Id do gestor',
+                            'visible': 'false'
+                          }
+												]
+											}" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="gestorNomeE">
+                    Gestor aprovador da Filial Emitente
+                  </label>
+                  <input type="text" placeholder="Nome do gestor aprovador do centro de custo" class="form-control"
+                    name="gestorNomeE" id="gestorNomeE" data-protection="Gestor aprovador do centro de custo"
+                    data-protection-anonymizable data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="gestorEmail"> E-mail do gestor </label>
+                  <input type="text" placeholder="E-mail do gestor aprovador do centro de custo" name="gestorEmailE"
+                    id="gestorEmailE" class="form-control" data-protection="E-mail do gestor"
+                    data-protection-anonymizable data-protection-sensitive data-protection-mail
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="gestorNome">
+                    Gestor aprovador da Filial Destino
+                  </label>
+                  <input type="text" placeholder="Nome do gestor aprovador do centro de custo" class="form-control"
+                    name="gestorNome" id="gestorNome" data-protection="Gestor aprovador do centro de custo"
+                    data-protection-anonymizable data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="gestorEmail"> E-mail do gestor </label>
+                  <input type="text" placeholder="E-mail do gestor aprovador do centro de custo" name="gestorEmail"
+                    id="gestorEmail" class="form-control" data-protection="E-mail do gestor"
+                    data-protection-anonymizable data-protection-sensitive data-protection-mail
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-product" aria-hidden="true"></i>
+              &nbsp;Itens &nbsp;
+            </h2>
+            <h6>
+              Dados referentes ao itens de Transferência necessários para o
+              solicitante.
+            </h6>
+            <br />
+          </div>
+
+          <div id="blocoAnexoExcel" style="margin-bottom: 10px;">
+            <label><b>Importar itens via Excel:</b></label><br>
+        
+            <!-- input hidden, controlado pelos botões -->
+            <input type="file" id="excelUpload" name="excelUpload" accept=".xlsx, .xls" style="display: none;" />
+        
+            <!-- botão personalizado para escolher arquivo -->
+            <button type="button" class="btn btn-primary btn-sm" id="btnAdicionarExcel">
+                Adicionar arquivo
+            </button>
+        
+            <!-- botão de remover, só aparece se tiver arquivo -->
+            <button type="button" class="btn btn-danger btn-sm" id="btnRemoverExcel" style="display: none; margin-left: 10px;">
+                Remover arquivo
+            </button>
+        
+            <!-- nome do arquivo -->
+            <div id="nomeArquivoExcel" style="margin-top: 5px; font-style: italic; color: #555;"></div>
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <table tablename="tabelaItens" class="table" id="tabelaItens" noaddbutton="true"
+                    nodeletebutton="true">
+                    <thead>
+                      <tr class="tableHeadRow">
+                        <th class="tableColumn">#</th>
+                        <th class="tableColumn">Código do Item</th>
+                        <th class="tableColumn">Quantidade</th>
+                        <th class="tableColumn">Descrição</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="tableBodyRow">
+                        <td style="width: 10%">
+                          <div class="form-input">
+                            <span><strong class="tabela_itens_id"> </strong></span>
+                          </div>
+                        </td>
+                        <td style="width: 25%">
+                          <div class="form-input">
+                            <input type="zoom" class="form-control requiredInput" name="descricao" id="descricao"
+                              data-zoom="{
+																'displayKey':'codigo',
+																'datasetId':'revenda',
+																'maximumSelectionLength':'1',
+																'placeholder':'Buscar item',
+                                'resultlimit':'10',
+																'fields':[
+																	{
+																		'field':'codigo',
+																		'label':' Código do Item',
+																		'standard':'true',
+                                    'search': 'true'
+																	}, 
+                                  {
+																		'field':'descricao',
+																		'label':'Nome do Item',
+																		'standard':'true',
+                                    'search': 'true'
+																	}
+																]
+															}" />
+                            <p class="text-danger text-error">
+                              Preenchimento obrigatório.
+                            </p>
+                          </div>
+                        </td>
+                        <td style="width: 10%">
+                          <div class="form-input">
+                            <input type="number" placeholder="Inserir quantidade" class="form-control requiredInput"
+                              name="quantidadeItem" id="quantidadeItem" />
+                            <p class="text-danger text-error">
+                              Preenchimento obrigatório.
+                            </p>
+                          </div>
+                        </td>
+                        <td style="width: 40%">
+                          <div class="form-input">
+                            <input type="text" class="form-control" name="codigoItem" id="codigoItem" readonly />
+                          </div>
+                        </td>
+                        <td class="hideButton" style="width: 70px">
+                          <button onClick="remove_row(this)" class="fluigicon fluigicon-trash fluigicon-md btn"
+                            style="position: initial; background: white"></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="row hideButton">
+                    <div class="col-md-3 col-xs-3" style="cursor: pointer" onClick="add_new_row('tabelaItens')">
+                      <span class="fluigicon fluigicon-plus fluigicon-sm"></span>
+                      &nbsp;&nbsp;
+                      <label style="cursor: pointer">
+                        Adicionar novo item
+                      </label>
+                    </div>
+                    <br />
+                    <br />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-message-question" aria-hidden="true"></i>
+              &nbsp;Justificativa &nbsp;
+            </h2>
+            <h6>
+              Motivos para a transferência dos itens e as possíveis informações
+              complementares.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="justificativa">
+                    Qual o motivo da Transferência?
+                  </label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea placeholder="Descreva o motivo para a solicitação de transferência"
+                    class="form-control requiredInput" rows="3" id="justificativa" name="justificativa"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <br />
+        </div>
+
+        <div class="activity activity-4">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Validação dos Itens &nbsp;
+            </h2>
+            <h6>
+              Informações complementares sobre a validação dos
+              da solicitação.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoGestor">
+                    Gestor responsável pela validação
+                  </label>
+                  <input type="text" name="userValidacaoGestor" id="userValidacaoGestor" class="form-control"
+                    data-protection="Gestor aprovador do centro de custo" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoGestor"> Data </label>
+                  <input type="text" name="dataValidacaoGestor" id="dataValidacaoGestor" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-4">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoGestor">Justificativa</label>
+                  <textarea placeholder="Descreva a justificativa para a validação." class="form-control"
+                    name="justificativaDecisaoGestor" id="justificativaDecisaoGestor"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-5">
+              <label class="control-label">Anexe uma foto embalando os Produtos</label>
+              <div class="componentAnexo">
+                <input type="hidden" id="fdAnexo_embalar" class="descAnexo" name="fdAnexo_embalar"
+                  value="Anexo Embalar" />
+                <input type="text" id="fnAnexo_embalar" name="fnAnexo_embalar" class="form-control inputAnexo"
+                  placeholder="Selecione um arquivo" readonly />
+                <div style="display: flex" class="icones">
+                  <button type="button" style="margin-left: 3px;" class="btnUpFile btn btn-success btn-sm excluir"
+                    data-acao="upload" onclick="anexo(event)" title="Selecionar">
+                    <i class="fluigicon fluigicon-file-upload icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button" class="btnViewerFile btn btn-info btn-sm"
+                    data-acao="viewer" onclick="anexo(event)" title="Visualizar" disabled>
+                    <i class="fluigicon fluigicon-eye-open icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnDownloadFile btn btn-info btn-sm" data-acao="download" onclick="anexo(event)"
+                    title="Download" disabled>
+                    <i class="fluigicon fluigicon-download icon-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-6">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-tests-central" aria-hidden="true"></i>
+              &nbsp;Emissão da NFE de transferência &nbsp;
+            </h2>
+            <h6>
+              Informações complementares sobre a emissão da NFE.
+            </h6>
+            <br />
+          </div>
+          
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoCompras">
+                    Usuário responsável pela Emissão
+                  </label>
+                  <input type="text" name="userValidacaoCompras" id="userValidacaoCompras" class="form-control"
+                    data-protection="Usuário responsável pela análise da solicitação" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoCompras"> Data </label>
+                  <input type="text" name="dataValidacaoCompras" id="dataValidacaoCompras" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div class="row justificativa-activity-6">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoCompras">Chave da Nota Fiscal</label>
+                  <textarea placeholder="Insira a chave da nota fiscal" class="form-control"
+                    rows="1" name="justificativaDecisaoCompras" id="justificativaDecisaoCompras"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-5">
+              <label class="control-label">Anexe aqui a Nota Fiscal</label>
+              <div class="componentAnexo">
+                <input type="hidden" id="fdAnexo_Nfe" class="descAnexo" name="fdAnexo_Nfe" value="Anexo NFE" />
+                <input type="text" id="fnAnexo_Nfe" name="fnAnexo_Nfe" class="form-control inputAnexo"
+                  placeholder="Selecione um arquivo" readonly />
+                <div style="display: flex" class="icones">
+                  <button type="button" style="margin-left: 3px;" class="btnUpFile btn btn-success btn-sm excluir"
+                    data-acao="upload" onclick="anexo(event)" title="Selecionar">
+                    <i class="fluigicon fluigicon-file-upload icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button" class="btnViewerFile btn btn-info btn-sm"
+                    data-acao="viewer" onclick="anexo(event)" title="Visualizar" disabled>
+                    <i class="fluigicon fluigicon-eye-open icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnDownloadFile btn btn-info btn-sm" data-acao="download" onclick="anexo(event)"
+                    title="Download" disabled>
+                    <i class="fluigicon fluigicon-download icon-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-31">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-edit-square" aria-hidden="true"></i>
+              &nbsp;Motorista Responsável pela coleta &nbsp;
+            </h2>
+            <h6>
+              Considerações sobre a coleta
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userRealizacaoCompras">
+                    Usuário responsável pela transferência
+                  </label>
+                  <input type="text" name="userRealizacaoCompras" id="userRealizacaoCompras" class="form-control"
+                    data-protection="Usuário responsável pela compra" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataRealizacaoCompras"> Data </label>
+                  <input type="text" name="dataRealizacaoCompras" id="dataRealizacaoCompras" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-31">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="consideracoesCompras"> Considerações sobre os itens da solicitação, realizadas pelo
+                    motorista responsável pela transferência. </label>
+                  <textarea placeholder="Insira suas considerações sobre o pedido de compras" class="form-control"
+                    rows="3" id="consideracoesCompras" name="consideracoesCompras"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-5">
+              <label class="control-label">Anexe uma foto coletando os Produtos</label>
+              <div class="componentAnexo">
+                <input type="hidden" id="fdAnexo_Coleta" class="descAnexo" name="fdAnexo_Coleta" value="Anexo Coleta" />
+                <input type="text" id="fnAnexo_Coleta" name="fnAnexo_Coleta" class="form-control inputAnexo"
+                  placeholder="Selecione um arquivo" readonly />
+                <div style="display: flex" class="icones">
+                  <button type="button" style="margin-left: 3px;" class="btnUpFile btn btn-success btn-sm excluir"
+                    data-acao="upload" onclick="anexo(event)" title="Selecionar">
+                    <i class="fluigicon fluigicon-file-upload icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button" class="btnViewerFile btn btn-info btn-sm"
+                    data-acao="viewer" onclick="anexo(event)" title="Visualizar" disabled>
+                    <i class="fluigicon fluigicon-eye-open icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnDownloadFile btn btn-info btn-sm" data-acao="download" onclick="anexo(event)"
+                    title="Download" disabled>
+                    <i class="fluigicon fluigicon-download icon-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-57">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-edit-square" aria-hidden="true"></i>
+              &nbsp;Motorista responsável pela entrega &nbsp;
+            </h2>
+            <h6>
+              Considerações sobre a entrega.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userCotacaoGestor">
+                    Considerações sobre a entrega
+                  </label>
+                  <input type="text" name="userCotacaoGestor" id="userCotacaoGestor" class="form-control"
+                    data-protection="Usuário responsável pela cotacao" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataAprovCompras"> Data </label>
+                  <input type="text" name="dataAprovCompras" id="dataAprovCompras" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-57">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="consideracoesCotacao"> Considerações sobre a coleta. </label>
+                  <textarea placeholder="Insira suas considerações sobre a transferência" class="form-control" rows="3"
+                    id="consideracoesCotacao" name="consideracoesCotacao"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-5">
+              <label class="control-label">Anexe uma foto do canhoto da nota</label>
+              <div class="componentAnexo">
+                <input type="hidden" id="fdAnexo_Entrega" class="descAnexo" name="fdAnexo_Entrega"
+                  value="Anexo Entrega" />
+                <input type="text" id="fnAnexo_Entrega" name="fnAnexo_Entrega" class="form-control inputAnexo"
+                  placeholder="Selecione um arquivo" readonly />
+                <div style="display: flex" class="icones">
+                  <button type="button" style="margin-left: 3px;" class="btnUpFile btn btn-success btn-sm excluir"
+                    data-acao="upload" onclick="anexo(event)" title="Selecionar">
+                    <i class="fluigicon fluigicon-file-upload icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button" class="btnViewerFile btn btn-info btn-sm"
+                    data-acao="viewer" onclick="anexo(event)" title="Visualizar" disabled>
+                    <i class="fluigicon fluigicon-eye-open icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnDownloadFile btn btn-info btn-sm" data-acao="download" onclick="anexo(event)"
+                    title="Download" disabled>
+                    <i class="fluigicon fluigicon-download icon-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-18">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Validação dos Itens entregues &nbsp;
+            </h2>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoItens"> Responsável pelo recebimento </label>
+                  <input type="text" name="userValidacaoItens" id="userValidacaoItens" class="form-control"
+                    data-protection="Solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoItens"> Data </label>
+                  <input type="text" name="dataValidacaoItens" id="dataValidacaoItens" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Houve algum problema com a transferência?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensEntregue" value="entregue" type="radio" />
+                      <span class="change-weight">Não houve problema</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensNaoEntregue" value="naoEntregue" type="radio" />
+                      <span class="change-weight">Transferência não entregue</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensIncorreto" value="incorreto" type="radio" />
+                      <span class="change-weight">Entregue com inconsistência (qualidade, quantidade,
+                        embalagem)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativaDecisaoItens">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoItens">Justificativa</label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea class="form-control requiredInput"
+                    placeholder="Insira a justificativa sobre a validação dos itens" name="justificativaDecisaoItens"
+                    id="justificativaDecisaoItens"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-5">
+              <label class="control-label">Anexe uma foto da mercadoria no Practico Live</label>
+              <div class="componentAnexo">
+                <input type="hidden" id="fdAnexo_recebimento" class="descAnexo" name="fdAnexo_recebimento"
+                  value="Anexo Recebimento" />
+                <input type="text" id="fnAnexo_recebimento" name="fnAnexo_recebimento" class="form-control inputAnexo"
+                  placeholder="Selecione um arquivo" readonly />
+                <div style="display: flex" class="icones">
+                  <button type="button" style="margin-left: 3px;" class="btnUpFile btn btn-success btn-sm excluir"
+                    data-acao="upload" onclick="anexo(event)" title="Selecionar">
+                    <i class="fluigicon fluigicon-file-upload icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button" class="btnViewerFile btn btn-info btn-sm"
+                    data-acao="viewer" onclick="anexo(event)" title="Visualizar" disabled>
+                    <i class="fluigicon fluigicon-eye-open icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnDownloadFile btn btn-info btn-sm" data-acao="download" onclick="anexo(event)"
+                    title="Download" disabled>
+                    <i class="fluigicon fluigicon-download icon-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-24">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-document-check" aria-hidden="true"></i>
+              &nbsp;Validar problema de transferência &nbsp;
+            </h2>
+            <h6>Dados referentes às possíveis implicações desta transferência.</h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label for="justificativaValidaProblema">Quais as suas considerações?</label>
+              <span class="text-danger"><strong>*</strong></span>
+              <textarea placeholder="Insira as considerções desta transferência." class="form-control"
+                name="justificativaValidaProblema" id="justificativaValidaProblema"></textarea>
+              <p class="text-danger text-error">
+                Preenchimento obrigatório.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h6 class="asteristicWarning">
+          Todos os campos com * são de preenchimento obrigatório.
+        </h6>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>

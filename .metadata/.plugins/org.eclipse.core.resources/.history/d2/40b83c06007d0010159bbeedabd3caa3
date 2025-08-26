@@ -1,0 +1,22 @@
+function createDataset(fields, constraints, sortFields) {
+    var dataset = DatasetBuilder.newDataset();
+    
+    try {
+        var client = ServiceManager.getService("API Protheus Full");
+        
+        // Listar todos os métodos disponíveis
+        var methods = "";
+        for (var prop in client) {
+            if (typeof client[prop] === 'function') {
+                methods += prop + ", ";
+            }
+        }
+        
+        dataset.addRow(["Debug", "Métodos: " + methods, ""]);
+        
+    } catch (e) {
+        dataset.addRow(["Erro", "", e.toString()]);
+    }
+    
+    return dataset;
+}

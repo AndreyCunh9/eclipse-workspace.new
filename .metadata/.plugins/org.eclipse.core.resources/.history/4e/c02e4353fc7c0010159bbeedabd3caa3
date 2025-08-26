@@ -1,0 +1,52 @@
+function createDataset(fields, constraints, sortFields) {
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/rest_teste/uf_mata010";
+    var method = "POST";
+    var params = "{}";
+
+    if (constraints) {
+        constraints.forEach(function(c) {
+            if (c.fieldName == "serviceCode") serviceCode = c.initialValue;
+            if (c.fieldName == "endpoint") endpoint = c.initialValue;
+            if (c.fieldName == "method") method = c.initialValue.toUpperCase();
+            if (c.fieldName == "params") params = c.initialValue;
+        });
+    }
+
+    var dataset = DatasetBuilder.newDataset();
+
+    try {
+        var clientService = ServiceManager.getServiceInstance(serviceCode);
+        var client = clientService.getClient();
+        
+        // Configurar headers
+        client.addHeader("Content-Type", "application/json");
+        client.addHeader("Accept", "application/json");
+        
+        // ✅ CORREÇÃO: Substituir switch por if/else mais simples
+        var result;
+        if (method === "GET") {
+            result = client.get(endpoint);
+        } else if (method === "POST") {
+            result = client.post(endpoint, params);
+        } else if (method === "PUT") {
+            result = client.put(endpoint, params);
+        } else  {
+            throw new Error("Método HTTP não suportado: " + method);
+        }
+
+        var statusCode = result.getStatusCode();
+        var response = result.getResult();
+        
+        log.info("Status Code: " + statusCode);
+        log.info("Response: " + response);
+        
+        dataset.addRow([statusCode.toString(), response, ""]);
+
+    } catch (e) {
+        log.error("Erro ao chamar Protheus: " + e);
+        dataset.addRow(["Erro", "", (e.message || e.toString())]);
+    }
+
+    return dataset;
+}

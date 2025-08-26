@@ -1,0 +1,63 @@
+var ComprasDigitalEdit = SuperWidget.extend({
+  init: function () {},
+
+  bindings: {
+    local: {
+      'save': ['click_save'],
+      'fill-example': ['click_fillExample']
+    }
+  },
+
+  save: function () {
+    var txt = $('#cd-cards-' + this.instanceId).val() || '[]';
+    try { JSON.parse(txt); } catch (e) {
+      FLUIGC.toast({ title: 'Erro: ', message: 'JSON inválido', type: 'danger' });
+      return;
+    }
+    this.setPreference({ 'cards': txt });
+    FLUIGC.toast({ title: 'OK: ', message: 'Configurações salvas', type: 'success' });
+  },
+
+  fillExample: function () {
+    var ex = [
+      {
+        "title": "Cadastro de Produtos",
+        "text": "Gerencie produtos.",
+        "href": "/portal/p/1/pageprocessstart?processId=CadastroProdutos",
+        "icon": "fluigicon-box",
+        "target": "_self"
+      },
+      {
+        "title": "Solicitação de Compras",
+        "text": "Abra uma solicitação.",
+        "href": "/portal/p/1/pageprocessstart?processId=Solicita%C3%A7%C3%A3o%20de%20compras%20-%20v2",
+        "icon": "fluigicon-cart"
+      },
+      {
+        "title": "Cotações",
+        "text": "Compare orçamentos.",
+        "href": "/portal/p/1/pagina-cotacoes",
+        "icon": "fluigicon-money"
+      },
+      {
+        "title": "Pedidos de Compras",
+        "text": "Acompanhe pedidos.",
+        "href": "/portal/p/1/pageworkflowview",
+        "icon": "fluigicon-check"
+      },
+      {
+        "title": "Notas Fiscais",
+        "text": "Entrada e conferência.",
+        "href": "/portal/p/1/ecmnavigator",
+        "icon": "fluigicon-document-alt"
+      },
+      {
+        "title": "Parâmetros",
+        "text": "Configurações do módulo.",
+        "href": "/portal/p/1/pagina-parametros",
+        "icon": "fluigicon-cog"
+      }
+    ];
+    $('#cd-cards-' + this.instanceId).val(JSON.stringify(ex, null, 2));
+  }
+});

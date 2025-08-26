@@ -1,0 +1,69 @@
+function defineStructure() {
+    addColumn("status");   // Código HTTP ou "Erro"
+    addColumn("mensagem"); // Retorno da API ou sucesso
+    addColumn("erro");     // Mensagem de erro, se houver
+}
+
+function onSync(lastSyncDate) {}
+function onMobileSync(user) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/rest_teste/uf_mata010"; // ← Corrigido para incluir o path completo
+    var method = "POST";
+    var params = "{}";
+
+    if (constraints) {
+        constraints.forEach(function(c) {
+            if (c.fieldName == "serviceCode") serviceCode = c.initialValue;
+            if (c.fieldName == "endpoint") endpoint = c.initialValue;
+            if (c.fieldName == "method") method = c.initialValue.toUpperCase();
+            if (c.fieldName == "params") params = c.initialValue;
+        });
+    }
+
+    var dataset = DatasetBuilder.newDataset();
+
+    try {
+        // ✅ FORMA CORRETA para serviços REST no Fluig
+        var clientService = ServiceManager.getServiceInstance(serviceCode);
+        var client = clientService.getClient();
+        
+        // Configurar headers
+        client.addHeader("Content-Type", "application/json");
+        client.addHeader("Accept", "application/json");
+        
+        // Fazer a chamada conforme o método HTTP
+        var result;
+        switch(method) {
+            case "GET":
+                result = client.get(endpoint);
+                break;
+            case "POST":
+                result = client.post(endpoint, params);
+                break;
+            case "PUT":
+                result = client.put(endpoint, params);
+                break;
+            case "DELETE":
+                result = client.delete(endpoint);
+                break;
+            default:
+                throw new Error("Método HTTP não suportado: " + method);
+        }
+
+        var statusCode = result.getStatusCode();
+        var response = result.getResult();
+        
+        log.info("Status Code: " + statusCode);
+        log.info("Response: " + response);
+        
+        dataset.addRow([statusCode.toString(), response, ""]);
+
+    } catch (e) {
+        log.error("Erro ao chamar Protheus: " + e);
+        dataset.addRow(["Erro", "", (e.message || e.toString())]);
+    }
+
+    return dataset;
+}

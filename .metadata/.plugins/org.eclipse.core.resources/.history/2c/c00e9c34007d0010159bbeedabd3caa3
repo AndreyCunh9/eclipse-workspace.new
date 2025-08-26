@@ -1,0 +1,86 @@
+function defineStructure() {
+    addColumn("status");
+    addColumn("mensagem");
+    addColumn("erro");
+}
+
+function onSync(lastSyncDate) {}
+function onMobileSync(user) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var dataset = DatasetBuilder.newDataset();
+    dataset.addColumn("status");
+    dataset.addColumn("mensagem");
+    dataset.addColumn("erro");
+
+    log.info("### Recebendo dados do formulário para Protheus ###");
+
+    // ✅ VALORES PADRÃO (serão sobrescritos pelas constraints)
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/uf_mata010";
+    var method = "POST";
+    var params = "{}";
+
+    // ✅ CAPTURAR DADOS DO FORMULÁRIO (via constraints)
+    if (constraints && constraints.length > 0) {
+        for (var i = 0; i < constraints.length; i++) {
+            var constraint = constraints[i];
+            
+            if (constraint.fieldName == "serviceCode" && constraint.initialValue) {
+                serviceCode = constraint.initialValue;
+            }
+            if (constraint.fieldName == "endpoint" && constraint.initialValue) {
+                endpoint = constraint.initialValue;
+            }
+            if (constraint.fieldName == "method" && constraint.initialValue) {
+                method = constraint.initialValue.toUpperCase();
+            }
+            if (constraint.fieldName == "params" && constraint.initialValue) {
+                params = constraint.initialValue;
+            }
+        }
+    }
+
+    log.info("Service: " + serviceCode);
+    log.info("Endpoint: " + endpoint);
+    log.info("Method: " + method);
+    log.info("Params: " + params);
+
+    try {
+        // ✅ USAR FLUIG API PARA CHAMADA AUTORIZADA
+        var clientService = fluigAPI.getAuthorizeClientService();
+        
+        var requestData = {
+            companyId: "1",
+            serviceCode: serviceCode,
+            endpoint: endpoint,
+            method: method.toLowerCase(),
+            timeoutService: "60000",
+            params: params, // ✅ SEUS DADOS DO FORMULÁRIO
+            options: {
+                encoding: "UTF-8",
+                contentType: "application/json", // ✅ IMPORTANTE
+                useBasicAuth: true,
+                username: "ezequiel.falcao",     // ✅ SEU USUÁRIO
+                password: "Ginseng@"             // ✅ SUA SENHA
+            }
+        };
+
+        log.info("Enviando para Protheus: " + JSON.stringify(requestData));
+
+        // ✅ FAZER A CHAMADA
+        var result = clientService.invoke(JSON.stringify(requestData));
+        var response = result.getResult();
+        
+        log.info("Resposta do Protheus: " + response);
+
+        // ✅ RETORNAR SUCESSO
+        dataset.addRow(["200", response, ""]);
+
+    } catch (error) {
+        log.error("Erro ao enviar para Protheus: " + error.toString());
+        dataset.addRow(["Erro", "", error.toString()]);
+    }
+
+    return dataset;
+}

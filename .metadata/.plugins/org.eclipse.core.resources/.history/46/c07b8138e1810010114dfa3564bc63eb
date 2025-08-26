@@ -1,0 +1,134 @@
+function initForm() {
+  // calendário e máscara simples
+  FLUIGC.calendar('#dataNec');
+  $('#precoRef').on('blur', recalcTotal);
+  $('#quantidade').on('input', recalcTotal);
+  $('#qtdMais').on('click', () => stepQtd(1));
+  $('#qtdMenos').on('click', () => stepQtd(-1));
+
+  // botões produto
+  $('#btnBuscaProd').on('click', () => openZoomProduto());
+  $('#btnLimpaProd').on('click', () => { $('#produtoCod,#produtoDesc').val(''); $('#ultimoPreco').val('0,00'); recalcTotal(); });
+
+  // zooms (empresa, filial, centro de custo)
+  bindZoom($('#empresaDesc'), 'EMPRESAS_DS', ['codigo','descricao'], 'empresaCodigo','empresaDesc');
+  bindZoom($('#filialDesc'),  'FILIAIS_DS',  ['codigo','descricao'], 'filialCodigo','filialDesc');
+  bindZoom($('#ccDesc'),      'CENTROCUSTO_DS',['codigo','descricao'], 'ccCod','ccDesc');
+
+  // adicionar item à tabela
+  $('#btnAddItem').on('click', addItem);
+}
+
+function stepQtd(n){
+  const $q = $('#quantidade');
+  let v = parseInt($q.val()||'0',10)+n;
+  if (v<0) v=0;
+  $q.val(v);
+  recalcTotal();
+}
+
+function parseMoneyBR(s){
+  if(!s) return 0;
+  s = (''+s).replace(/[^\d,.-]/g,'').replace('.','').replace(',','.');
+  const v = Number(s);
+  return isNaN(v)?0:v;
+}
+function formatMoneyBR(v){
+  return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+
+function recalcTotal(){
+  const qtd = parseFloat($('#quantidade').val()||'0');
+  const preco = parseMoneyBR($('#precoRef').val());
+  const tot = (qtd*preco) || 0;
+  $('#total').val(formatMoneyBR(tot));
+}
+
+function bindZoom($input, datasetId, displayFields, hiddenIdFld, displayFld){
+  $input.on('click', function(){
+    FLUIGC.filtermodal({
+      title: 'Selecionar',
+      size: 'large',
+      filterFields: displayFields.join(', '),
+      source: {
+        url: '/api/public/ecm/dataset/search',
+        contentType: 'application/json',
+        root: 'content',
+        pattern: '',
+        limit: 50,
+        param:{
+          datasetId: datasetId
+        }
+      },
+      columns: [
+        { title: 'Código', data: 'codigo' },
+        { title: 'Descrição', data: 'descricao' }
+      ],
+      onSelected: function(data){
+        $('#'+hiddenIdFld).val(data.codigo);
+        $('#'+displayFld).val(data.codigo+' - '+data.descricao);
+      }
+    });
+  });
+}
+
+function openZoomProduto(){
+  FLUIGC.filtermodal({
+    title: 'Buscar Produto/Serviço',
+    size: 'large',
+    filterFields: 'codigo, descricao',
+    source: {
+      url: '/api/public/ecm/dataset/search',
+      contentType: 'application/json',
+      root: 'content',
+      limit: 50,
+      param:{ datasetId: 'PRODUTOS_DS' }
+    },
+    columns: [
+      { title: 'Código', data: 'codigo' },
+      { title: 'Descrição', data: 'descricao' },
+      { title: 'UM', data: 'um' },
+      { title: 'Último Preço', data: 'ultimoPreco' }
+    ],
+    onSelected: function(item){
+      $('#produtoCod').val(item.codigo);
+      $('#produtoDesc').val(item.codigo+' - '+item.descricao);
+      $('#ultimoPreco').val((item.ultimoPreco||'0,00'));
+      recalcTotal();
+    }
+  });
+}
+
+function addItem(){
+  // valida campos mínimos
+  if(!$('#produtoCod').val()){ FLUIGC.toast({title:'Atenção: ', message:'Selecione um produto.', type:'warning'}); return; }
+  if(!$('#ccCod').val()){ FLUIGC.toast({title:'Atenção: ', message:'Selecione o centro de custo.', type:'warning'}); return; }
+  const qtd = parseFloat($('#quantidade').val()||'0'); if(qtd<=0){ FLUIGC.toast({title:'Atenção: ', message:'Quantidade deve ser > 0.', type:'warning'}); return; }
+
+  const row = wdkAddChild('tbItens');
+  $('#produtoCod___'+row).val($('#produtoCod').val());
+  $('#produtoDesc___'+row).val($('#produtoDesc').val());
+  $('#ccCod___'+row).val($('#ccCod').val());
+  $('#ccDesc___'+row).val($('#ccDesc').val());
+  $('#qtd___'+row).val(qtd);
+  $('#precoRef___'+row).val($('#precoRef').val());
+  $('#total___'+row).val($('#total').val());
+}
+
+// validação de processo
+function validateForm(form){
+  var msgs = [];
+  function req(id, label){ if(!form.getValue(id)) msgs.push('Preencha "'+label+'".'); }
+
+  req('tipoSolicitacao','Tipo de Solicitação');
+  req('produtoCod','Produto/Serviço');
+  req('quantidade','Quantidade');
+  req('dataNec','Data da Necessidade');
+  req('ccCod','Centro de Custo');
+
+  if(msgs.length){
+    throw msgs.join('\n');
+  }
+}
+
+$(document).ready(initForm);

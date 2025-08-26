@@ -1,0 +1,6 @@
+var ABERTURA = 0;
+var INICIO = 4;
+var EMISSAO = 6;
+var COLETA = 31;
+var ENTREGA = 57;
+var RECEBIMENTO = 18;

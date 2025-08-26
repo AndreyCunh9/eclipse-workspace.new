@@ -1,0 +1,18 @@
+<div id="compras_edit_${instanceId}" class="super-widget wcm-widget-class"
+     data-params="ComprasDigitalEdit.instance()">
+
+  <div class="panel panel-default">
+    <div class="panel-heading"><b>Configurar cartões</b></div>
+    <div class="panel-body">
+      <p>Informe os cartões em <b>JSON</b> (title, text, href, icon, target).</p>
+      <textarea id="cd-cards-${instanceId}" class="form-control" rows="12">${cards!''}</textarea>
+      <div style="margin-top:10px">
+        <button class="btn btn-primary" data-save>Salvar</button>
+        <button class="btn btn-default" data-fill-example>Preencher exemplo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="/webdesk/vcXMLRPC?widgetID=${widgetId}&file=resources/js/cd-edit.js"></script>
+<link rel="stylesheet" type="text/css" href="/webdesk/vcXMLRPC?widgetID=${widgetId}&file=resources/css/cd.css"/>

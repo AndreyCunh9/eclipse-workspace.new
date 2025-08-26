@@ -1,0 +1,127 @@
+<#-- Puxa o dataset de notícias -->
+<#assign dsNoticias = DatasetFactory.getDataset("Noticias", null, null, null) />
+
+<style>
+/* Container principal */
+.slider-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+/* Wrapper dos slides */
+.slider-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Card individual */
+.slider-card {
+    flex: 0 0 25%; /* 4 cards por vez no desktop */
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.slider-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+}
+
+.slider-card h3 {
+    margin: 8px 0 4px;
+    font-size: 16px;
+}
+
+.slider-card p {
+    font-size: 13px;
+    color: #555;
+}
+
+/* Botões */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    font-size: 24px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+.slider-btn.prev { left: 5px; }
+.slider-btn.next { right: 5px; }
+
+/* Responsivo */
+@media screen and (max-width: 900px) {
+    .slider-card { flex: 0 0 33.33%; } /* 3 cards */
+}
+@media screen and (max-width: 600px) {
+    .slider-card { flex: 0 0 50%; } /* 2 cards */
+}
+@media screen and (max-width: 400px) {
+    .slider-card { flex: 0 0 100%; } /* 1 card */
+}
+</style>
+
+<div class="slider-container">
+    <div class="slider-wrapper" id="sliderWrapper">
+        <#list dsNoticias.values as noticia>
+            <div class="slider-card">
+                <a href="${noticia[2]!}" target="_blank">
+                    <img src="${noticia[3]!}" alt="${noticia[0]!}">
+                </a>
+                <h3>${noticia[0]!}</h3>
+                <p>${noticia[1]!}</p>
+            </div>
+        </#list>
+    </div>
+    <button class="slider-btn prev" onclick="prevCard()">&#10094;</button>
+    <button class="slider-btn next" onclick="nextCard()">&#10095;</button>
+</div>
+
+<script>
+const sliderWrapper = document.getElementById('sliderWrapper');
+const cards = sliderWrapper.children;
+let cardIndex = 0;
+
+// Quantos cards são visíveis atualmente
+function visibleCards() {
+    if (window.innerWidth <= 400) return 1;
+    if (window.innerWidth <= 600) return 2;
+    if (window.innerWidth <= 900) return 3;
+    return 4;
+}
+
+function updateSlider() {
+    const shift = (100 / visibleCards()) * cardIndex;
+    sliderWrapper.style.transform = `translateX(-${shift}%)`;
+}
+
+// Botões
+function nextCard() {
+    const maxIndex = cards.length - visibleCards();
+    cardIndex = Math.min(cardIndex + 1, maxIndex);
+    updateSlider();
+}
+
+function prevCard() {
+    cardIndex = Math.max(cardIndex - 1, 0);
+    updateSlider();
+}
+
+// Redimensionamento da tela
+window.addEventListener('resize', updateSlider);
+
+// Auto-slide opcional (descomente se quiser)
+// setInterval(nextCard, 5000);
+
+updateSlider();
+</script>

@@ -1,0 +1,897 @@
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="/style-guide/css/fluig-style-guide.min.css" />
+
+  <script src="/resources/js/jquery/jquery.js"></script>
+  <script src="/resources/js/jquery/jquery-ui.min.js"></script>
+  <script src="/resources/js/mustache/mustache-min.js"></script>
+  <script src="/style-guide/js/fluig-style-guide.min.js"></script>
+  <script type="text/javascript" src="/webdesk/vcXMLRPC.js"></script>
+  <script type="text/javascript" src="script.js"></script>
+
+
+  <style>
+    h6 {
+      color: #afb0b3 !important;
+      font-weight: normal !important;
+    }
+
+    h2 {
+      color: #008ac4 !important;
+      display: flex !important;
+      flex-direction: row !important;
+    }
+
+    h2:after {
+      content: "" !important;
+      flex: 1 1 !important;
+      border-bottom: 2px solid #008ac4 !important;
+      margin: auto !important;
+    }
+
+    .flaticon {
+      color: #008ac4 !important;
+    }
+
+    #rcorners {
+      height: 110px;
+      line-height: 110px;
+      color: white;
+      border-radius: 0px 0px 50px 50px;
+      background: rgb(0, 138, 192);
+      background: linear-gradient(90deg,
+          rgba(0, 138, 192, 1) 0%,
+          rgba(2, 166, 189, 1) 50%,
+          rgba(1, 192, 181, 1) 100%);
+      text-align: center !important;
+    }
+
+    .change-weight {
+      font-weight: 400 !important;
+    }
+
+    .asteristicWarning {
+      color: #000000 !important;
+      margin-top: 50px !important;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .errorValidate .requiredInput,
+    .errorValidate .select2 {
+      border: 2px solid #cc3d3d !important;
+    }
+
+    .text-error {
+      font-size: 10px;
+      margin: 0;
+      display: none;
+    }
+
+    .errorValidate .text-error {
+      display: block;
+    }
+
+    input.select2-search__field::placeholder {
+      color: #afb0b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="fluig-style-guide" style="background-color: white">
+    <form>
+      <div style="display: none">
+        <input type="text" id="WKNumProces" name="WKNumProces" />
+        <input type="text" id="activity" name="activity" />
+        <input type="text" id="formMode" name="formMode" />
+
+        <!-- requester -->
+        <input type="text" id="requesterMail" name="requesterMail" />
+        <input type="text" id="requesterId" name="requesterId" />
+
+        <!-- current user -->
+        <input type="text" id="currentUserName" name="currentUserName" />
+        <input type="text" id="currentUsermail" name="currentUsermail" />
+        <input type="text" id="currentUserId" name="currentUserId" />
+
+        <input type="text" id="gestor_cc" name="gestor_cc" />
+      </div>
+
+      <h1 id="rcorners">Solicitação de compra</h1>
+
+      <div class="container activity-all">
+        <div class="activity activity-0 activity-1">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-account-box" aria-hidden="true"></i>
+              &nbsp;Dados gerais &nbsp;
+            </h2>
+            <h6>
+              Dados referentes aos responsáveis pela abertura e pela
+              solicitação do atual processo.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="requesterName"> Usuário de abertura </label>
+                  <input type="text" name="requesterName" id="requesterName" class="form-control"
+                    data-protection="Usuário de abertura" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataAbertura"> Data </label>
+                  <input type="text" name="dataAbertura" id="dataAbertura" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="userSolicitante"> Usuário solicitante </label>
+                  <input placeholder="Inserir nome solicitante." type="text" class="form-control" name="userSolicitante"
+                    id="userSolicitante" data-protection="Usuário solicitante" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo" />
+                </div>
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="emailSolicitante">
+                    E-mail do solicitante
+                  </label>
+                  <input placeholder="Inserir e-mail do solicitante. Ex.: Joaodasilva@email.com.br" type="text"
+                    name="emailSolicitante" id="emailSolicitante" class="form-control"
+                    data-protection="E-mail do solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-mail
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="estabelecimento">
+                    Estabelecimento/Filial
+                  </label>
+                  <span class="required text-danger"><strong> * </strong></span>
+                  <input type="zoom" class="form-control requiredInput" name="estabelecimento" id="estabelecimento"
+                    data-zoom="{
+												'displayKey':'DESCRICAO',
+												'datasetId':'dsSysCompany',
+												'placeholder': 'Pesquisar por nome do estabelecimento.',
+												'fields':[
+													{
+														'field':'CODIGO',
+														'label':'Filial',
+														'standard':'true',
+														'search':'true'
+													},
+                          {
+														'field':'DESCRICAO',
+														'label':'estabelecimento',
+														'search':'true'
+													},
+                          {
+														'field':'BPCS',
+														'label':'bpcs',
+														'search':'true'
+													}
+												]
+											}" />
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="centroCusto"> Centro de Custo </label>
+                  <input type="zoom" class="form-control" name="centroCusto" id="centroCusto" data-zoom="{
+												'displayKey':'codigoCentroCusto',
+												'datasetId':'ds_centroCusto',
+												'placeholder': 'Pesquisar número ou nome do centro de custo.',
+												'fields':[
+													{
+														'field':'codigoCentroCusto',
+														'label':'Código',
+														'standard':'true',
+														'search':'true'
+													},
+													{
+														'field':'centroCusto',
+														'label':'Centro de custo',
+														'search':'true'
+													},
+                          {
+                            'field': 'gestorCentroCusto',
+                            'label': 'Gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'emailGestor',
+                            'label': 'Email do gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'idGestor',
+                            'label': 'Id do gestor',
+                            'visible': 'false'
+                          }
+												]
+											}" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="gestorNome">
+                    Gestor aprovador do centro de custo
+                  </label>
+                  <input type="text" placeholder="Nome do gestor aprovador do centro de custo" class="form-control"
+                    name="gestorNome" id="gestorNome" data-protection="Gestor aprovador do centro de custo"
+                    data-protection-anonymizable data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="gestorEmail"> E-mail do gestor </label>
+                  <input type="text" placeholder="E-mail do gestor aprovador do centro de custo" name="gestorEmail"
+                    id="gestorEmail" class="form-control" data-protection="E-mail do gestor"
+                    data-protection-anonymizable data-protection-sensitive data-protection-mail
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="cnpj"> CNPJ da filial </label>
+                  <span class="required text-danger"><strong> * </strong></span>
+                  <input type="text" name="cnpj" id="cnpj" class="form-control requiredInput" readonly/>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+                <div class="form-group col-md-6 col-xs-6" style="visibility: hidden;">
+                  <label for="protheus">Protheus</label>
+                  <span class="required text-danger"><strong> * </strong></span>
+                  <input type="text" name="protheus" id="protheus" class="form-control requiredInput" readonly/>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-product" aria-hidden="true"></i>
+              &nbsp;Itens &nbsp;
+            </h2>
+            <h6>
+              Clique no botao Selecionar Produtos para confirmar o produto para compra ser efetuada.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-group col-md-12 col-xs-12">
+              <button type="button" class="btn btn-primary" onclick="consultarProdutos()">Selecionar Produtos</button>
+              <button type="button" class="btn btn-primary" onclick="cadastrarProduto()">Cadastrar Produtos</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <table tablename="tabelaItens" class="table" id="tabelaItens" noaddbutton="true"
+                    nodeletebutton="true">
+                    <thead>
+                      <tr class="tableHeadRow">
+                        <th class="tableColumn">#</th>
+                        <th class="tableColumn">Código do Item</th>
+                        <th class="tableColumn">Quantidade</th>
+                        <th class="tableColumn">Descrição do Item</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="tableBodyRow">
+                        <td style="width: 10%">
+                          <div class="form-input">
+                            <span><strong class="tabela_itens_id"> </strong></span>
+                          </div>
+                        </td>
+                        <td style="width: 40%">
+                          <div class="form-input">
+                            <input type="text" placeholder="Selecione o produto no botão acima" class="form-control requiredInput"
+                              name="descricao" id="descricao" readonly/>
+                            <p class="text-danger text-error">
+                              Preenchimento obrigatório.
+                            </p>
+                          </div>
+                        </td>
+                        <td style="width: 5%">
+                          <div class="form-input">
+                            <input type="text" placeholder="Inserir quantidade" class="form-control requiredInput"
+                              name="quantidadeItem" id="quantidadeItem" />
+                            <p class="text-danger text-error">
+                              Preenchimento obrigatório.
+                            </p>
+                          </div>
+                        </td>
+                        <td style="width: 40%">
+                          <div class="form-input">
+                            <input type="text" class="form-control" name="codigoItem" id="codigoItem" readonly />
+                          </div>
+                        </td>
+                        <td class="hideButton" style="width: 70px">
+                          <button onClick="remove_row(this)" class="fluigicon fluigicon-trash fluigicon-md btn"
+                            style="position: initial; background: white"></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-message-question" aria-hidden="true"></i>
+              &nbsp;Justificativa &nbsp;
+            </h2>
+            <h6>
+              Motivos para a compra dos itens e as possíveis informações
+              complementares.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="justificativa">
+                    Qual o motivo da compra?
+                  </label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea placeholder="Descreva o motivo para a solicitação de compra"
+                    class="form-control requiredInput" rows="3" id="justificativa" name="justificativa"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <br />
+        </div>
+
+        <div class="activity activity-4">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Validação do centro de custo &nbsp;
+            </h2>
+            <h6>
+              Informações complementares sobre a validação do centro de custo
+              da solicitação.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoGestor">
+                    Gestor aprovador do centro de custo
+                  </label>
+                  <input type="text" name="userValidacaoGestor" id="userValidacaoGestor" class="form-control"
+                    data-protection="Gestor aprovador do centro de custo" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoGestor"> Data </label>
+                  <input type="text" name="dataValidacaoGestor" id="dataValidacaoGestor" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-4">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoGestor">Justificativa</label>
+                  <textarea placeholder="Descreva a justificativa para a validação do centro de custo."
+                    class="form-control" name="justificativaDecisaoGestor" id="justificativaDecisaoGestor"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-6">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-tests-central" aria-hidden="true"></i>
+              &nbsp;Cotação de produtos &nbsp;
+            </h2>
+            <h6>
+              Dados referentes a análise da solicitação feita.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoCompras">
+                    Usuário responsável pela cotação
+                  </label>
+                  <input type="text" name="userValidacaoCompras" id="userValidacaoCompras" class="form-control"
+                    data-protection="Usuário responsável pela análise da solicitação" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoCompras"> Data </label>
+                  <input type="text" name="dataValidacaoCompras" id="dataValidacaoCompras" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="numCotacoes">Cotações por produto:</label>
+                  <input type="number" id="numCotacoes" name="cotacaouser" placeholder="Número de cotações" min="1">
+                  <button id="gerarTabela" class="btn btn-primary btn-sm"
+                    onclick="gerarTabelaCotacaoComNumeracao('tabelaCotacao', 'tabelaItens')">Gerar Tabela</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="col-md-12">
+                  <table class="table" tablename="tabelaCotacao" id="tabelaCotacao" noaddbutton="true"
+                    nodeletebutton="true">
+                    <thead>
+                      <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 20%;">Item de compra</th>
+                        <th style="width: 10%;">Quantidade</th>
+                        <th style="width: 20%;">Fornecedor</th>
+                        <th style="width: 10%;">Preço</th>
+                        <th style="width: 15%;">Data de entrega</th>
+                        <th style="width: 20%;">Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Número do item -->
+                          <div class="fs-font-bold fs-md-margin-bottom count" id="numCotacao"></div>
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Item de compra -->
+                          <input type="text" class="form-control" name="itemCompra" id="itemCompra" readonly />
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Quantidade -->
+                          <input type="number" class="form-control" name="quantidade" id="quantidade" min="0" />
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Fornecedor -->
+                          <input type="text" class="form-control" name="fornecedor" id="fornecedor" />
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Preço -->
+                          <div class="input-container">
+                            <i class="fa-solid fa-money-bill"></i>
+                            <input type="text" class="form-control" name="preco" id="preco" />
+                          </div>
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Data de entrega -->
+                          <input type="date" class="form-control" name="dataEntrega" id="dataEntrega" />
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <!-- Email -->
+                          <input type="email" class="form-control" name="email" id="email" />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-12">
+                  <div class="row">
+                    <br />
+                    <h2>
+                      <i class="flaticon flaticon-aim" aria-hidden="true"></i>
+                      &nbsp;Sugestão do Analista &nbsp;
+                    </h2>
+                    <h6>
+                      Análise do Analista sobre a cotação realizada.
+                    </h6>
+                    <br />
+                  </div>
+                </div>
+                <div class="row justificativa-activity-6">
+                  <div class="form-field">
+                    <div class="form-input">
+                      <div class="form-group col-md-12">
+                        <label for="justificativaDecisaoCompras">Detalhes</label>
+                        <textarea placeholder="Insira suas considerações sobre o pedido de compras" class="form-control"
+                          name="justificativaDecisaoCompras" id="justificativaDecisaoCompras"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-field">
+                    <div class="form-input">
+                      <div class="col-md-12">
+                        <table class="table" tablename="tabelaCotacaoIndica" id="tabelaCotacaoIndica" noaddbutton="true"
+                          nodeletebutton="true">
+                          <thead>
+                            <tr>
+                              <th style="width: 10%;">Item de compra</th>
+                              <th style="width: 10%;">Quantidade</th>
+                              <th style="width: 10%;">Preço</th>
+                              <th style="width: 15%;">Data de entrega</th>
+                              <th style="width: 15%;">Fornecedor</th>
+                              <th style="width: 15%;">Pagamento</th>
+
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td class="fs-v-align-top fs-text-center">
+                                <!-- Item de compra -->
+                                <input type="text" class="form-control" name="itemCompraIndica" id="itemCompraIndica"
+                                  readonly />
+                              </td>
+                              <td class="fs-v-align-top fs-text-center">
+                                <!-- Quantidade -->
+                                <input type="number" class="form-control" name="quantidadeIndica" id="quantidadeIndica"
+                                  readonly />
+                              </td>
+                              <td class="fs-v-align-top fs-text-center">
+                                <!-- Preço -->
+                                <div class="input-container">
+                                  <i class="fa-solid fa-money-bill"></i>
+                                  <input type="text" class="form-control" name="precoIndica" id="precoIndica" />
+                                </div>
+                              </td>
+                              <td class="fs-v-align-top fs-text-center">
+                                <!-- Data de entrega -->
+                                <input type="date" class="form-control" name="dataEntregaIndica"
+                                  id="dataEntregaIndica" />
+                              </td>
+                              <td class="fs-v-align-top fs-text-center">
+                                <input type="zoom" class="form-control requiredInput" name="fornecedorIndica"
+                                  id="fornecedorIndica" data-zoom="{ 
+                                    'displayKey':'codigo',
+                                    'datasetId':'ds_fornecedor',
+                                    'maximumSelectionLength':'1',
+                                    'placeholder':'Fornecedor',
+                                    'fields':[
+                                      {
+                                        'field':'codigo',
+                                        'label':' Codigo do fornecedor',
+                                        'standard':'true',
+                                        'search': 'true'
+                                      }, 
+                                      {
+                                        'field':'nome',
+                                        'label':'Nome do fornecedor',
+                                        'standard':'true',
+                                        'search': 'true'
+                                      }
+                                    ]
+                                  }" />
+                              </td>
+                              <!-- Prazo de pagamento -->
+                              <td class="fs-v-align-top fs-text-center">
+                                <input type="zoom" class="form-control requiredInput" name="condPagamentoIndica"
+                                  id="condPagamentoIndica" data-zoom="{
+                                    'displayKey':'codigo',
+                                    'datasetId':'ds_condPag',
+                                    'maximumSelectionLength':'1',
+                                    'placeholder':'Prazo',
+                                    'fields':[
+                                      {
+                                        'field':'codigo',
+                                        'label':' Codigo do prazo',
+                                        'standard':'true',
+                                        'search': 'true'
+                                      }, 
+                                      {
+                                        'field':'descricao',
+                                        'label':'descricao do codigo',
+                                        'standard':'true',
+                                        'search': 'true'
+                                      }
+                                    ]
+                                  }" />
+                              </td>
+                            </tr>
+                          </tbody>
+                          <!-- Linha para exibir o valor total -->
+                        </table>
+                        <div class="row">
+                          <div class="col-lg-3 col-md-3 col-sm-12">
+                            <div class="form-group">
+                              <label> <strong>Valor Total da Cotação</strong></label>
+                              <input type="number" name="valorTotalsemformat" id="valorTotalsemformat" readonly />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-57">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-edit-square" aria-hidden="true"></i>
+              &nbsp;Gestor aprovador da cotação &nbsp;
+            </h2>
+            <h6>
+              Considerações sobre a cotação realizada pelo setor de compras.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userCotacaoGestor">
+                    Gestor responsável pela cotação
+                  </label>
+                  <input type="text" name="userCotacaoGestor" id="userCotacaoGestor" class="form-control"
+                    data-protection="Usuário responsável pela cotacao" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataAprovCompras"> Data </label>
+                  <input type="text" name="dataAprovCompras" id="dataAprovCompras" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-57">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="consideracoesCotacao"> Considerações </label>
+                  <textarea placeholder="Insira suas considerações sobre o pedido de compras" class="form-control"
+                    rows="3" id="consideracoesCotacao" name="consideracoesCotacao"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-31">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-edit-square" aria-hidden="true"></i>
+              &nbsp;Considerações de compras &nbsp;
+            </h2>
+            <h6>
+              Considerações sobre os itens da solicitação, realizadas pela
+              pessoa responsável pela compra.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userRealizacaoCompras">
+                    Usuário responsável pela compra
+                  </label>
+                  <input type="text" name="userRealizacaoCompras" id="userRealizacaoCompras" class="form-control"
+                    data-protection="Usuário responsável pela compra" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataRealizacaoCompras"> Data </label>
+                  <input type="text" name="dataRealizacaoCompras" id="dataRealizacaoCompras" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-31">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="consideracoesCompras"> Considerações </label>
+                  <textarea placeholder="Insira suas considerações sobre o pedido de compras" class="form-control"
+                    rows="3" id="consideracoesCompras" name="consideracoesCompras"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-5">
+              <label class="control-label">Anexe o pedido de compra</label>
+              <div class="componentAnexo">
+                <input type="hidden" id="fdAnexo_pedido" class="descAnexo" name="fdAnexo_pedido" value="Anexo Pedido" />
+                <input type="text" id="fnAnexo_pedido" name="fnAnexo_pedido" class="form-control inputAnexo"
+                  placeholder="Selecione um arquivo" readonly />
+                <div style="display: flex" class="icones">
+                  <button type="button" style="margin-left: 3px;" class="btnUpFile btn btn-success btn-sm excluir"
+                    data-acao="upload" onclick="anexo(event)" title="Selecionar">
+                    <i class="fluigicon fluigicon-file-upload icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnViewerFile btn btn-info btn-sm" data-acao="viewer" onclick="anexo(event)"
+                    title="Visualizar" disabled>
+                    <i class="fluigicon fluigicon-eye-open icon-sm"></i>
+                  </button>
+                  <button style="display: none; margin-left: 3px;" type="button"
+                    class="btnDownloadFile btn btn-info btn-sm" data-acao="download" onclick="anexo(event)"
+                    title="Download" disabled>
+                    <i class="fluigicon fluigicon-download icon-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-18">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Validação dos itens &nbsp;
+            </h2>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoItens"> Solicitante </label>
+                  <input type="text" name="userValidacaoItens" id="userValidacaoItens" class="form-control"
+                    data-protection="Solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoItens"> Data </label>
+                  <input type="text" name="dataValidacaoItens" id="dataValidacaoItens" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Houve algum problema com a compra?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensEntregue" value="entregue" type="radio" />
+                      <span class="change-weight">Não houve problema</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensNaoEntregue" value="naoEntregue" type="radio" />
+                      <span class="change-weight">Pedido não entregue</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensIncorreto" value="incorreto" type="radio" />
+                      <span class="change-weight">Entregue com inconsistência (qualidade, quantidade,
+                        embalagem)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativaDecisaoItens">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoItens">Justificativa</label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea class="form-control requiredInput"
+                    placeholder="Insira a justificativa sobre a validação dos itens" name="justificativaDecisaoItens"
+                    id="justificativaDecisaoItens"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-24">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-document-check" aria-hidden="true"></i>
+              &nbsp;Validar problema: considerações de compras &nbsp;
+            </h2>
+            <h6>Dados referentes às possíveis implicações desta compra.</h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label for="justificativaValidaProblema">Quais as suas considerações?</label>
+              <span class="text-danger"><strong>*</strong></span>
+              <textarea placeholder="Insira as considerções desta compra." class="form-control"
+                name="justificativaValidaProblema" id="justificativaValidaProblema"></textarea>
+              <p class="text-danger text-error">
+                Preenchimento obrigatório.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h6 class="asteristicWarning">
+          Todos os campos com * são de preenchimento obrigatório.
+        </h6>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>

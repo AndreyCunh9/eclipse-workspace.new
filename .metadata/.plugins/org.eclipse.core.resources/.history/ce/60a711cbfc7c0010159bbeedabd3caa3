@@ -1,0 +1,50 @@
+function defineStructure() {
+    addColumn("status");
+    addColumn("mensagem"); 
+    addColumn("erro");
+}
+
+function onSync(lastSyncDate) {}
+function onMobileSync(user) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/rest_teste/uf_mata010";
+    var method = "POST";
+    var params = "{}";
+
+    // Processar constraints
+    if (constraints) {
+        for (var i = 0; i < constraints.length; i++) {
+            var c = constraints[i];
+            if (c.fieldName == "serviceCode") serviceCode = c.initialValue;
+            if (c.fieldName == "endpoint") endpoint = c.initialValue;
+            if (c.fieldName == "method") method = c.initialValue.toUpperCase();
+            if (c.fieldName == "params") params = c.initialValue;
+        }
+    }
+
+    var dataset = DatasetBuilder.newDataset();
+
+    try {
+        var client = ServiceManager.getService(serviceCode);
+        
+        // ✅ FORMA CORRETA para Crystal Mist 1.8.2
+        var response = client.invoke(
+            endpoint,      // URL endpoint
+            params,        // corpo da requisição
+            method,        // método HTTP
+            "application/json", // content-type
+            "application/json"  // accept
+        );
+        
+        log.info("Resposta do Protheus: " + response);
+        dataset.addRow(["200", response, ""]);
+
+    } catch (e) {
+        log.error("Erro ao chamar Protheus: " + e.toString());
+        dataset.addRow(["Erro", "", e.toString()]);
+    }
+
+    return dataset;
+}

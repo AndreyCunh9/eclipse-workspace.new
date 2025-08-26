@@ -1,0 +1,917 @@
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="/style-guide/css/fluig-style-guide.min.css" />
+
+  <script src="/resources/js/jquery/jquery.js"></script>
+  <script src="/resources/js/jquery/jquery-ui.min.js"></script>
+  <script src="/resources/js/mustache/mustache-min.js"></script>
+  <script src="/style-guide/js/fluig-style-guide.min.js"></script>
+  <script type="text/javascript" src="/webdesk/vcXMLRPC.js"></script>
+  <script type="text/javascript" src="script.js"></script>
+  <link
+      href="/webdesk/customresources?cid=4&resourceName=temaFormulario/0.css"
+      type="text/css"
+      rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="/style-guide/css/fluig-style-guide-ratingstars.min.css"
+  />
+  <script src="/style-guide/js/fluig-style-guide-ratingstars.min.js"></script>
+
+
+  <style>
+    h6 {
+      color: #afb0b3 !important;
+      font-weight: normal !important;
+    }
+
+    h2 {
+      color: #008ac4 !important;
+      display: flex !important;
+      flex-direction: row !important;
+    }
+
+    h2:after {
+      content: "" !important;
+      flex: 1 1 !important;
+      border-bottom: 2px solid #008ac4 !important;
+      margin: auto !important;
+    }
+
+    .flaticon {
+      color: #008ac4 !important;
+    }
+
+    #rcorners {
+      height: 110px;
+      line-height: 110px;
+      color: white;
+      border-radius: 0px 0px 50px 50px;
+      background: rgb(0, 138, 192);
+      background: linear-gradient(90deg,
+          rgba(0, 138, 192, 1) 0%,
+          rgba(2, 166, 189, 1) 50%,
+          rgba(1, 192, 181, 1) 100%);
+      text-align: center !important;
+    }
+
+    .change-weight {
+      font-weight: 400 !important;
+    }
+
+    .asteristicWarning {
+      color: #000000 !important;
+      margin-top: 50px !important;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .errorValidate .requiredInput,
+    .errorValidate .select2 {
+      border: 2px solid #cc3d3d !important;
+    }
+
+    .text-error {
+      font-size: 10px;
+      margin: 0;
+      display: none;
+    }
+
+    .errorValidate .text-error {
+      display: block;
+    }
+
+    input.select2-search__field::placeholder {
+      color: #afb0b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="fluig-style-guide" style="background-color: white">
+    <form>
+      <div style="display: none">
+        <input type="text" id="WKNumProces" name="WKNumProces" />
+        <input type="text" id="activity" name="activity" />
+        <input type="text" id="formMode" name="formMode" />
+
+        <!-- requester -->
+        <input type="text" id="requesterMail" name="requesterMail" />
+        <input type="text" id="requesterId" name="requesterId" />
+
+        <!-- current user -->
+        <input type="text" id="currentUserName" name="currentUserName" />
+        <input type="text" id="currentUsermail" name="currentUsermail" />
+        <input type="text" id="currentUserId" name="currentUserId" />
+
+        <input type="text" id="gestor_cc" name="gestor_cc" />
+      </div>
+
+      <h1 id="rcorners">Recrutamento e Seleção</h1>
+
+      <div class="container activity-all">
+        <div class="activity activity-0 activity-1">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-account-box" aria-hidden="true"></i>
+              &nbsp;Dados gerais &nbsp;
+            </h2>
+            <h6>
+              Dados referentes aos responsáveis pela abertura e pela
+              solicitação do atual processo.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="requesterName"> Usuário de abertura </label>
+                  <input type="text" name="requesterName" id="requesterName" class="form-control"
+                    data-protection="Usuário de abertura" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataAbertura"> Data </label>
+                  <input type="text" name="dataAbertura" id="dataAbertura" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="estabelecimento">
+                    Estabelecimento/Filial
+                  </label>
+                  <span class="required text-danger"><strong> * </strong></span>
+                  <input type="zoom" class="form-control requiredInput" name="estabelecimento" id="estabelecimento"
+                    data-zoom="{
+												'displayKey':'estabelecimento',
+												'datasetId':'dsFiliais',
+												'placeholder': 'Pesquisar nome do estabelecimento ou filial.',
+												'fields':[
+													{
+														'field':'estabelecimento',
+														'label':'Filial',
+														'standard':'true',
+														'search':'true'
+													},
+                          {
+														'field':'codigo',
+														'label':'Protheus',
+														'search':'true'
+													}
+												]
+											}" />
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="centroCusto"> Centro de Custo </label>
+                  <input type="zoom" class="form-control" name="centroCusto" id="centroCusto" data-zoom="{
+												'displayKey':'centroCusto',
+												'datasetId':'ds_Liderdireto',
+												'placeholder': 'Pesquisar número ou nome do centro de custo.',
+												'fields':[
+													{
+														'field':'centroCusto',
+														'label':'Centro de custo',
+														'search':'true'
+													},
+                          {
+                            'field': 'gestorCentroCusto',
+                            'label': 'Gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'emailGestor',
+                            'label': 'Email do gestor',
+                            'visible': 'false'
+                          },
+                          {
+                            'field': 'idGestor',
+                            'label': 'Id do gestor',
+                            'visible': 'false'
+                          }
+												]
+											}" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="gestorNome">
+                    Gestor aprovador da seleção
+                  </label>
+                  <input type="text" placeholder="Nome do gestor aprovador do centro de custo" class="form-control"
+                    name="gestorNome" id="gestorNome" data-protection="Gestor aprovador do centro de custo"
+                    data-protection-anonymizable data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-6 col-xs-6">
+                  <label for="gestorEmail"> E-mail do gestor </label>
+                  <input type="text" placeholder="E-mail do gestor aprovador do centro de custo" name="gestorEmail"
+                    id="gestorEmail" class="form-control" data-protection="E-mail do gestor"
+                    data-protection-anonymizable data-protection-sensitive data-protection-mail
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="funcao">
+                    Função
+                  </label>
+                  <span class="required text-danger"><strong> * </strong></span>
+                  <input type="zoom" class="form-control requiredInput" name="funcao" id="funcao" data-zoom="{
+												'displayKey':'descricao',
+												'datasetId':'ds_cargos',
+												'placeholder': 'Pesquisar nome do estabelecimento ou filial.',
+												'fields':[
+													{
+														'field':'descricao',
+														'label':'Descrição',
+														'standard':'true',
+														'search':'true'
+													}
+												]
+											}" />
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="confidencial"> A Vaga é confidencial?</label>
+                  <select class="form-control" name="confidencial" id="confidencial">
+                    <option value selected hidden>Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="urgente"> A Vaga é urgente?</label>
+                  <select class="form-control" name="urgente" id="urgente">
+                    <option value selected hidden>Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6 col-xs-12">
+                  <label for="estado"> Estado </label>
+                  <input type="text" name="estado" id="estado" class="form-control"
+                    readonly="readonly">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-product" aria-hidden="true"></i>
+              &nbsp;Motivo &nbsp;
+            </h2>
+            <h6>
+              Dados referentes ao motivo da solicitação.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Qual o motivo da solicitação?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div>
+                    <label>
+                      <input name="validarMotivo" id="validacaoMotivoAumento" value="aumento" type="radio" />
+                      <span class="change-weight">Aumento de quadro</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validarMotivo" id="validacaoMotivoSubstituicao" value="substituição" type="radio" />
+                      <span class="change-weight">Substituição</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validarMotivo" id="validacaoMotivotemporario" value="temporario" type="radio" />
+                      <span class="change-weight">Temporário</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-message-question" aria-hidden="true"></i>
+              &nbsp;Justificativa de Descrição de perfil &nbsp;
+            </h2>
+            <h6>
+              Motivos para a solicitação do colaborador e as possíveis informações complementares.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="justificativa">
+                    Justicativa do motivo da Solicitação?
+                  </label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea placeholder="Descreva o motivo para a solicitação da vaga"
+                    class="form-control requiredInput" rows="3" id="justificativa" name="justificativa"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="descricaodeperfil">
+                    Descreva o perfil do candidato(Técnico e comportamental)
+                  </label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea placeholder="Descreva o perfil do candidato" class="form-control requiredInput" rows="3"
+                    id="descricaodeperfil" name="descricaodeperfil"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <br />
+        </div>
+
+        <div class="activity activity-4">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Analisar necessidade da vaga &nbsp;
+            </h2>
+            <h6>
+              Informações complementares sobre a validação da vaga solicitada.
+            </h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoGestor">
+                    Gestor aprovador da seleção
+                  </label>
+                  <input type="text" name="userValidacaoGestor" id="userValidacaoGestor" class="form-control"
+                    data-protection="Gestor aprovador do centro de custo" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoGestor"> Data </label>
+                  <input type="text" name="dataValidacaoGestor" id="dataValidacaoGestor" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativa-activity-4">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoGestor">Justifique a decisão.</label>
+                  <textarea placeholder="Descreva a justificativa para a validação do centro de custo."
+                    class="form-control" name="justificativaDecisaoGestor" id="justificativaDecisaoGestor"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-6">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-tests-central" aria-hidden="true"></i>
+              &nbsp;Seleção dos candidatos &nbsp;
+            </h2>
+            <h6>
+              Dados referentes ao contato dos candidatos selecionados para a vaga.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoCompras">
+                    Usuário responsável pela seleção
+                  </label>
+                  <input type="text" name="userValidacaoCompras" id="userValidacaoCompras" class="form-control"
+                    data-protection="Usuário responsável pela análise da solicitação" data-protection-anonymizable
+                    data-protection-sensitive data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoCompras"> Data </label>
+                  <input type="text" name="dataValidacaoCompras" id="dataValidacaoCompras" class="form-control"
+                    readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12 col-xs-12">
+                  <label for="numCotacoes">Clique no botão para adicionar participantes</label>
+                  <button id="gerarTabela" class="btn btn-primary btn-sm"
+                    onclick="gerarTabelaCotacaoComNumeracao('tabelarecrutamento')">Adicionar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="col-md-12">
+                  <table class="table" tablename="tabelarecrutamento" id="tabelarecrutamento" noaddbutton="true"
+                    nodeletebutton="true">
+                    <thead>
+                      <tr>
+                        <th style="width: 20%;">Nome do candidato</th>
+                        <th style="width: 20%;">Telefone</th>
+                        <th style="width: 25%;">Email</th>
+                        <th style="width: 5%;">Aprovado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="fs-v-align-top fs-text-center">
+                          <input type="text" class="form-control" name="nomedocandidato">
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <input type="text" class="form-control" name="telefone" style="width: 150px;">
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <input type="email" class="form-control" name="email" style="width: 150px;">
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <input type="checkbox" name="aprovado">
+                        </td>
+                        <td class="fs-v-align-top fs-text-center">
+                          <button type="button" class="btn btn-danger btn-sm remover-linha"
+                            onclick="removeLinhaComAnexo(this)">Remover</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="row justificativa-activity-6">
+                  <div class="form-field">
+                    <div class="form-input">
+                      <div class="form-group col-md-12">
+                        <label for="justificativaDecisaoCompras">Informações adicionais da seleção</label>
+                        <textarea placeholder="Insira suas considerações sobre a seleção" class="form-control"
+                          name="justificativaDecisaoCompras" id="justificativaDecisaoCompras"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-31">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-edit-square" aria-hidden="true"></i>
+              &nbsp;Cheklist de Início das atividades &nbsp;
+            </h2>
+            <h6>
+              Checklist de Início.
+            </h6>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userRealizacaoCompras">
+                    Usuário responsável pela comunicação
+                  </label>
+                  <input type="text" name="userRealizacaoCompras" id="userRealizacaoCompras" class="form-control"
+                    data-protection="Usuário responsável pela compra" data-protection-anonymizable=""
+                    data-protection-sensitive="" data-protection-name=""
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly="readonly">
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataRealizacaoCompras"> Data </label>
+                  <input type="text" name="dataRealizacaoCompras" id="dataRealizacaoCompras" class="form-control"
+                    readonly="readonly">
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="datainiciotrabalho"> Data de início</label>
+                  <input type="date" name="datainiciotrabalho" id="datainiciotrabalho" class="form-control">
+                </div>
+                <div class="form-group col-md-10 col-xs-6">
+                  <label>Qual o Kit vai ser utilizado?</label>
+                  <span class="text-danger"><strong>*</strong></span><br>
+                  <div>
+                    <label>
+                      <input name="itensinicio" id="itensback" value="backoffice" type="radio">
+                      <span class="change-weight">Kit Backoffice (Notebook, mouse, teclado e headset).</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="itensinicio" id="itensamg" value="amg" type="radio">
+                      <span class="change-weight">Kit AMG (Notebook, Kit mouse e teclado, headset e telefone
+                        coporativo).</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="itensinicio" id="itenscomercial" value="comercial" type="radio">
+                      <span class="change-weight">Kit Comercial (Mobshop e Mobpin).</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group col-md-10 col-xs-6">
+                  <label>Fardamento pronto para ser entregue?</label>
+                  <span class="text-danger"><strong>*</strong></span><br>
+                  <div>
+                    <label>
+                      <input name="fardamentoPronto" id="fardamentoprontosim" value="pronto" type="radio">
+                      <span class="change-weight">Sim</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="fardamentoPronto" id="fardamentoprontonao" value="faltando" type="radio">
+                      <span class="change-weight">Não</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row justificativa-activity-31">
+              <div class="form-field">
+                <div class="form-input">
+                  <div class="form-group col-md-12 col-xs-12">
+                    <label for="consideracoesCompras"> Considerações </label>
+                    <textarea placeholder="Insira suas considerações" class="form-control" rows="3"
+                      id="consideracoesCompras" name="consideracoesCompras" value=""></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-24">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Entrega de equipamento &nbsp;
+            </h2>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoItens"> Analista responsável pela entrega do equipamento </label>
+                  <input type="text" name="userValidacaoItens" id="userValidacaoItens" class="form-control"
+                    data-protection="Solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoItens"> Data </label>
+                  <input type="text" name="dataValidacaoItens" id="dataValidacaoItens" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Houve alguma divergência com a entrega?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensEntregue" value="entregue" type="radio" />
+                      <span class="change-weight">Não houve problema</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensNaoEntregue" value="naoEntregue" type="radio" />
+                      <span class="change-weight">Foi entregue equipamentos seminovos.</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoItens" id="validacaoItensIncorreto" value="incorreto" type="radio" />
+                      <span class="change-weight">Entregue com inconsistência (qualidade, quantidade,
+                        embalagem)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativaDecisaoItens">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoItens">Detalhes dos equipamentos</label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea class="form-control requiredInput"
+                    placeholder="Insira a justificativa sobre a validação dos itens" name="justificativaDecisaoItens"
+                    id="justificativaDecisaoItens"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity activity-18">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-document-check" aria-hidden="true"></i>
+              &nbsp;Receber funcionário &nbsp;
+            </h2>
+            <h6>Dados referentes a chegada do funcionário.</h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaofunc"> Responsável por receber o funcionário </label>
+                  <input type="text" name="userValidacaofunc" id="userValidacaofunc" class="form-control"
+                    data-protection="Solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaofunc"> Data </label>
+                  <input type="text" name="dataValidacaofunc" id="dataValidacaofunc" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Houve algum problema na chegada do funcionário?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div>
+                    <label>
+                      <input name="validacaoFunc" id="validacaoFuncEntregue" value="entregue" type="radio" />
+                      <span class="change-weight">Não houve problema</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoFunc" id="validacaoFuncNaoEntregue" value="naoEntregue" type="radio" />
+                      <span class="change-weight">Equipamentos com inconsistência (qualidade, quantidade,
+                        embalagem) </span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoFunc" id="validacaoFuncIncorreto" value="incorreto" type="radio" />
+                      <span class="change-weight">Fardamento danificado (qualidade, quantidade,
+                        embalagem)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativaDecisaoFunc">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoFunc">Considerações</label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea class="form-control requiredInput" placeholder="Insira a justificativa"
+                    name="justificativaDecisaoFunc" id="justificativaDecisaoFunc"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="activity activity-57">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-check-circle" aria-hidden="true"></i>
+              &nbsp;Feedback da seleção &nbsp;
+            </h2>
+            <br />
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacao"> Gestor responsável	 </label>
+                  <input type="text" name="userValidacao" id="userValidacao" class="form-control" readonly
+                    data-protection="Usuário de abertura" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo" />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataUserValidacao"> Data </label>
+                  <input type="text" name="dataUserValidacao" id="dataUserValidacao" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Solicitação atendida?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div class="radio-inline">
+                    <label>
+                      <input name="situacaoResolvida" id="situacaoResolvidaSim" value="sim" type="radio" />
+                      <span class="change-weight">Sim</span>
+                    </label>
+                  </div>
+                  <div class="radio-inline">
+                    <label>
+                      <input name="situacaoResolvida" id="situacaoResolvidaNao" value="nao" type="radio" />
+                      <span class="change-weight">Não</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row ratingAction">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>Como você avalia esse processo?</label>
+                  <div class="ratingStars">
+                    <div class="minha-avaliacao"></div>
+                  </div>
+                  <input type="hidden" id="ratingValue" name="ratingValue" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row explainAction">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="consideracoes">Considerações</label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea class="form-control" name="consideracoes" id="consideracoes"
+                    placeholder="Descreva a justificativa para a sua avaliação"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="activity activity-114">
+          <div>
+            <br />
+            <h2>
+              <i class="flaticon flaticon-document-check" aria-hidden="true"></i>
+              &nbsp;Correção de materiais &nbsp;
+            </h2>
+            <h6>Dados referentes a correção dos materiais enviados para o novo colaborador.</h6>
+            <br />
+          </div>
+
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-10 col-xs-6">
+                  <label for="userValidacaoCorre"> Responsável pela correção do material </label>
+                  <input type="text" name="userValidacaoCorre" id="userValidacaoCorre" class="form-control"
+                    data-protection="Solicitante" data-protection-anonymizable data-protection-sensitive
+                    data-protection-name
+                    data-protection-class-legitimate-interests="Dado coletado para o funcionamento do processo"
+                    readonly />
+                </div>
+                <div class="form-group col-md-2 col-xs-6">
+                  <label for="dataValidacaoCorre"> Data </label>
+                  <input type="text" name="dataValidacaoCorre" id="dataValidacaoCorre" class="form-control" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label>As correções foram feitas?</label>
+                  <span class="text-danger"><strong>*</strong></span><br />
+                  <div>
+                    <label>
+                      <input name="validacaoCorre" id="validacaoCorreEntregue" value="entregue" type="radio" />
+                      <span class="change-weight">Correção efetuada</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      <input name="validacaoCorre" id="validacaoCorreNaoEntregue" value="naoEntregue" type="radio" />
+                      <span class="change-weight">Correção não efetuada</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justificativaDecisaoCorre">
+            <div class="form-field">
+              <div class="form-input">
+                <div class="form-group col-md-12">
+                  <label for="justificativaDecisaoCorre">Considerações</label>
+                  <span class="text-danger"><strong>*</strong></span>
+                  <textarea class="form-control requiredInput" placeholder="Insira a justificativa"
+                    name="justificativaDecisaoCorre" id="justificativaDecisaoCorre"></textarea>
+                  <p class="text-danger text-error">
+                    Preenchimento obrigatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h6 class="asteristicWarning">
+          Todos os campos com * são de preenchimento obrigatório.
+        </h6>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>

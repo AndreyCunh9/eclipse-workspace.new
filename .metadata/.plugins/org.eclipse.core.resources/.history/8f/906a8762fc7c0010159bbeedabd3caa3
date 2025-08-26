@@ -1,0 +1,66 @@
+function defineStructure() {
+    addColumn("status");
+    addColumn("mensagem"); 
+    addColumn("erro");
+}
+
+function onSync(lastSyncDate) {}
+function onMobileSync(user) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/rest_teste/uf_mata010";
+    var method = "POST";
+    var params = "{}";
+
+    // Processar constraints
+    if (constraints) {
+        for (var i = 0; i < constraints.length; i++) {
+            var c = constraints[i];
+            if (c.fieldName == "serviceCode") serviceCode = c.initialValue;
+            if (c.fieldName == "endpoint") endpoint = c.initialValue;
+            if (c.fieldName == "method") method = c.initialValue.toUpperCase();
+            if (c.fieldName == "params") params = c.initialValue;
+        }
+    }
+
+    var dataset = DatasetBuilder.newDataset();
+
+    try {
+        // ✅ FORMA CORRETA para a maioria das versões do Fluig
+        var client = ServiceManager.getService(serviceCode);
+        
+        // Fazer a chamada diretamente
+        var response;
+        if (method === "GET") {
+            response = client.get(endpoint);
+        } else if (method === "POST") {
+            response = client.post(endpoint, params);
+        } else if (method === "PUT") {
+            response = client.put(endpoint, params);
+        } else if (method === "DELETE") {
+            response = client.delete(endpoint);
+        } else {
+            throw new Error("Método não suportado: " + method);
+        }
+        
+        // Adicionar headers se necessário (algumas versões permitem)
+        try {
+            client.addHeader("Content-Type", "application/json");
+            client.addHeader("Accept", "application/json");
+        } catch (e) {
+            // Se não suportar addHeader, continua sem headers
+            log.warn("addHeader não suportado: " + e);
+        }
+
+        log.info("Resposta do Protheus: " + response);
+        
+        dataset.addRow(["200", response, ""]);
+
+    } catch (e) {
+        log.error("Erro ao chamar Protheus: " + e.toString());
+        dataset.addRow(["Erro", "", e.toString()]);
+    }
+
+    return dataset;
+}

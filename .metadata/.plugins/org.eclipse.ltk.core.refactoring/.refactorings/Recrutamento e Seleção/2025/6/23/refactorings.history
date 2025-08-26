@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Recrutamento e Seleção/datasets/ds_centroCusto.js&apos; to &apos;ds_Liderdireto.js&apos;" description="Rename resource &apos;ds_centroCusto.js&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="datasets/ds_centroCusto.js" name="ds_Liderdireto.js" stamp="1748977585563" updateReferences="true"/>
+</session>

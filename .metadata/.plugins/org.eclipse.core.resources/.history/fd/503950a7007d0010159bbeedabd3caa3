@@ -1,0 +1,70 @@
+function createDataset(fields, constraints, sortFields) {
+    var dataset = DatasetBuilder.newDataset();
+    dataset.addColumn("status");
+    dataset.addColumn("mensagem");
+    dataset.addColumn("erro");
+
+    log.info("### Recebendo dados do formulário para Protheus ###");
+
+    // ✅ VALORES PADRÃO
+    var serviceCode = "API Protheus Full";
+    var endpoint = "/uf_mata010";
+    var method = "POST";
+    var params = "{}";
+
+    // ✅ CAPTURAR DADOS DO FORMULÁRIO
+    if (constraints && constraints.length > 0) {
+        for (var i = 0; i < constraints.length; i++) {
+            var constraint = constraints[i];
+            
+            if (constraint.fieldName == "serviceCode" && constraint.initialValue) {
+                serviceCode = constraint.initialValue;
+            }
+            if (constraint.fieldName == "endpoint" && constraint.initialValue) {
+                endpoint = constraint.initialValue;
+            }
+            if (constraint.fieldName == "method" && constraint.initialValue) {
+                method = constraint.initialValue.toUpperCase();
+            }
+            if (constraint.fieldName == "params" && constraint.initialValue) {
+                params = constraint.initialValue;
+            }
+        }
+    }
+
+    try {
+        var clientService = fluigAPI.getAuthorizeClientService();
+        
+        // ✅ CORREÇÃO: Criar um MAP em vez de String
+        var requestMap = {
+            "companyId": "1",
+            "serviceCode": serviceCode,
+            "endpoint": endpoint,
+            "method": method.toLowerCase(),
+            "timeoutService": "60000",
+            "params": params, // ✅ String JSON aqui
+            "options": {
+                "encoding": "UTF-8",
+                "contentType": "application/json",
+                "useBasicAuth": true,
+                "username": "ezequiel.falcao",
+                "password": "Ginseng@"
+            }
+        };
+
+        log.info("Enviando MAP: " + JSON.stringify(requestMap));
+
+        // ✅ AGORA SIM: passar o Map diretamente
+        var result = clientService.invoke(requestMap); // ← SEM JSON.stringify()
+        var response = result.getResult();
+        
+        log.info("Resposta do Protheus: " + response);
+        dataset.addRow(["200", response, ""]);
+
+    } catch (error) {
+        log.error("Erro: " + error.toString());
+        dataset.addRow(["Erro", "", error.toString()]);
+    }
+
+    return dataset;
+}

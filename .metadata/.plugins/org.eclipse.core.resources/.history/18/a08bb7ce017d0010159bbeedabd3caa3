@@ -1,0 +1,78 @@
+function defineStructure() {
+    addColumn("status");
+    addColumn("mensagem");
+    addColumn("erro");
+}
+
+function onSync(lastSyncDate) {}
+function onMobileSync(user) {}
+
+function createDataset(fields, constraints, sortFields) {
+    var dataset = DatasetBuilder.newDataset();
+    dataset.addColumn("status");
+    dataset.addColumn("mensagem");
+    dataset.addColumn("erro");
+
+    log.info("### Enviando dados para Protheus com autenticação ###");
+
+    try {
+        // ✅ 1. CAPTURAR DADOS DO FORMULÁRIO
+        var jsonData = "{}";
+        if (constraints) {
+            for (var i = 0; i < constraints.length; i++) {
+                if (constraints[i].fieldName == "params" && constraints[i].initialValue) {
+                    jsonData = constraints[i].initialValue;
+                    break;
+                }
+            }
+        }
+
+        log.info("Dados recebidos: " + jsonData);
+
+        // ✅ 2. URL CORRETA
+        var url = "http://187.72.204.233:8099/rest_teste/uf_mata010";
+        var urlObj = new java.net.URL(url);
+        var connection = urlObj.openConnection();
+        var httpConn = connection;
+        
+        // ✅ 3. AUTENTICAÇÃO BASIC
+        var usuario = "ezequiel.falcao";
+        var senha = "Ginseng@";
+        var auth = usuario + ":" + senha;
+        var encodedAuth = java.util.Base64.getEncoder().encodeToString(auth.getBytes("UTF-8"));
+        
+        // Configurar conexão
+        httpConn.setDoOutput(true);
+        httpConn.setRequestMethod("POST");
+        httpConn.setRequestProperty("Content-Type", "application/json");
+        httpConn.setRequestProperty("Accept", "application/json");
+        httpConn.setRequestProperty("Authorization", "Basic " + encodedAuth); // ✅ HEADER DE AUTENTICAÇÃO
+        httpConn.setConnectTimeout(30000);
+        httpConn.setReadTimeout(30000);
+        
+        // ✅ 4. ENVIAR DADOS
+        var outputStream = httpConn.getOutputStream();
+        var writer = new java.io.OutputStreamWriter(outputStream, "UTF-8");
+        writer.write(jsonData);
+        writer.flush();
+        writer.close();
+        outputStream.close();
+        
+        // ✅ 5. LER RESPOSTA
+        var responseCode = httpConn.getResponseCode();
+        var inputStream = httpConn.getInputStream();
+        var scanner = new java.util.Scanner(inputStream, "UTF-8");
+        var response = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+        scanner.close();
+        
+        log.info("Status: " + responseCode + " - Response: " + response);
+        dataset.addRow([responseCode.toString(), response, ""]);
+
+    } catch (error) {
+        log.error("Erro completo: " + error.toString());
+        var errorMsg = error.toString();
+        dataset.addRow(["Erro", "", errorMsg]);
+    }
+
+    return dataset;
+}
